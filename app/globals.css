@@ -1,26 +1,225 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ── DESIGN TOKENS (Hand-Drawn palette) ──────────────────── */
+@theme {
+  --color-paper: #fdfbf7;
+  --color-pencil: #2d2d2d;
+  --color-pencil-40: rgba(45, 45, 45, 0.4);
+  --color-pencil-10: rgba(45, 45, 45, 0.1);
+  --color-muted: #e5e0d8;
+  --color-accent: #ff4d4d;
+  --color-accent-lt: #ffe5e5;
+  --color-ink: #2d5da1;
+  --color-ink-lt: #dbe7f7;
+  --color-postit: #fff9c4;
+  --color-postit-lt: #fffde7;
+  --color-leaf: #4a7c59;
+  --color-leaf-lt: #d9e9df;
+  --color-amber-sketch: #d97706;
+  --color-amber-lt: #fde68a;
+
+  --font-display: var(--font-kalam), cursive;
+  --font-body: var(--font-patrick), cursive;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --shadow-hand: 4px 4px 0px 0px #2d2d2d;
+  --shadow-hand-lg: 8px 8px 0px 0px #2d2d2d;
+  --shadow-hand-sm: 2px 2px 0px 0px #2d2d2d;
+  --shadow-hand-soft: 3px 3px 0px 0px rgba(45, 45, 45, 0.12);
+  --shadow-hand-accent: 4px 4px 0px 0px #ff4d4d;
+  --shadow-hand-ink: 4px 4px 0px 0px #2d5da1;
+
+  --animate-jiggle: jiggle 0.4s ease-in-out;
+  --animate-bounce-slow: bounce-slow 3s ease-in-out infinite;
+  --animate-sway: sway 4s ease-in-out infinite;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ── KEYFRAMES ───────────────────────────────────────────── */
+@keyframes jiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-2deg); }
+  75% { transform: rotate(2deg); }
+}
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-8px) rotate(4deg); }
+}
+@keyframes sway {
+  0%, 100% { transform: rotate(-1deg); }
+  50% { transform: rotate(1deg); }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── BASE ────────────────────────────────────────────────── */
+html, body {
+  background-color: var(--color-paper);
+  color: var(--color-pencil);
+  font-family: var(--font-body);
+  font-size: 16px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-image: radial-gradient(var(--color-muted) 1px, transparent 1px);
+  background-size: 24px 24px;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-muted);
+  border: 2px solid var(--color-paper);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-pencil-40); }
+
+::selection {
+  background: var(--color-postit);
+  color: var(--color-pencil);
+}
+
+/* ── WOBBLY BORDER UTILITIES (irregular organic ellipses) ── */
+@utility wobbly {
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+}
+@utility wobbly-md {
+  border-radius: 30px 8px 30px 8px / 8px 30px 8px 30px;
+}
+@utility wobbly-sm {
+  border-radius: 18px 6px 18px 6px / 6px 18px 6px 18px;
+}
+@utility wobbly-alt {
+  border-radius: 15px 255px 15px 225px / 225px 15px 255px 15px;
+}
+@utility wobbly-circle {
+  border-radius: 48% 52% 51% 49% / 49% 48% 52% 51%;
+}
+@utility wobbly-blob {
+  border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%;
+}
+
+/* ── HAND-DRAWN DATA SURFACES (hybrid: wobbly frame, straight rows) ── */
+@utility hd-table {
+  border: 2px solid var(--color-pencil);
+  border-radius: 14px 4px 14px 4px / 4px 14px 4px 14px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+/* ── TILTS (small deterministic rotations) ───────────────── */
+@utility tilt-l { transform: rotate(-1deg); }
+@utility tilt-r { transform: rotate(1deg); }
+@utility tilt-l2 { transform: rotate(-2deg); }
+@utility tilt-r2 { transform: rotate(2deg); }
+
+/* ── INTERACTIVE CLASSES (bypass twMerge dedupe) ─────────── */
+/* These live outside Tailwind utility-merge land so pairs like
+   `text-pencil/70 + hover:text-white` can't be collapsed by tailwind-merge. */
+
+.kb-tab {
+  padding: 0.5rem 1rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.kb-tab-active { background: var(--color-pencil); color: #ffffff; }
+.kb-tab-idle   { background: #ffffff; color: var(--color-pencil); }
+.kb-tab-idle:hover { background: var(--color-postit-lt); }
+
+/* Density 4/6/8 toggle inside toolbar */
+.kb-density-active { background: var(--color-pencil); color: #ffffff; }
+.kb-density-idle   { color: color-mix(in oklab, var(--color-pencil) 60%, transparent); }
+.kb-density-idle:hover { background: var(--color-muted); }
+
+/* Small action chip on hover-revealed card footer (edit / clone / delete) */
+.kb-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.kb-action-neutral {
+  color: color-mix(in oklab, var(--color-pencil) 70%, transparent);
+  border-color: color-mix(in oklab, var(--color-pencil) 40%, transparent);
+}
+.kb-action-neutral:hover {
+  background: var(--color-pencil);
+  color: #ffffff;
+  border-color: var(--color-pencil);
+}
+.kb-action-danger {
+  color: var(--color-accent);
+  border-color: color-mix(in oklab, var(--color-accent) 60%, transparent);
+}
+.kb-action-danger:hover {
+  background: var(--color-accent);
+  color: #ffffff;
+  border-color: var(--color-accent);
+}
+
+/* Top-nav active link in topbar */
+.nav-link-active {
+  background: var(--color-pencil);
+  color: #ffffff;
+  border-color: var(--color-pencil);
+}
+
+/* ── PRINT ───────────────────────────────────────────────── */
+@media print {
+  html, body {
+    background: #ffffff !important;
+    background-image: none !important;
+    color: #000000 !important;
+    font-size: 12pt;
+  }
+  /* Hide app chrome */
+  header, nav, [role="banner"], .no-print {
+    display: none !important;
+  }
+  .print-only { display: block !important; }
+  /* Flatten hand-drawn effects for crisp printing */
+  *, *::before, *::after {
+    box-shadow: none !important;
+    transform: none !important;
+  }
+  /* Keep wobbly borders but thinner */
+  * {
+    border-color: #000000 !important;
+  }
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+  /* Stretch main content to full width */
+  main, .print-wrap {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  table { page-break-inside: auto; }
+  tr    { page-break-inside: avoid; page-break-after: auto; }
+  thead { display: table-header-group; }
+}
+
+.print-only { display: none; }
+
+/* ── INPUTS: neutralize browser styling ──────────────────── */
+input, textarea, select, button {
+  font-family: inherit;
+  color: inherit;
+}
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: none;
 }
