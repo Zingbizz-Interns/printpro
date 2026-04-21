@@ -44,24 +44,24 @@ export function ItemsTable({ items, jobNo, onAdd, onUpdate, onRemove }: Props) {
   );
 
   return (
-    <Card tone="paper" wobbly="md">
-      <CardHeader>
-        <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-2xl">
-            Items <span className="text-pencil/50 font-mono text-lg">({items.length})</span>
+    <Card className="overflow-visible border border-border shadow-sm rounded-3xl">
+      <CardHeader className="px-8 pt-8 pb-4">
+        <div className="flex items-center justify-between gap-4">
+          <CardTitle className="text-2xl font-body font-bold text-foreground">
+            Items <span className="text-muted-foreground font-mono font-medium text-lg ml-2 bg-muted px-2 py-0.5 rounded-lg border border-border">{items.length}</span>
           </CardTitle>
-          <Button type="button" variant="primary" size="sm" onClick={onAdd}>
-            <Plus size={14} strokeWidth={3} /> add item
+          <Button type="button" variant="primary" size="sm" onClick={onAdd} className="shadow-md">
+            <Plus size={16} strokeWidth={2.5} className="mr-1" /> Add Item
           </Button>
         </div>
       </CardHeader>
-      <CardBody className="space-y-4">
+      <CardBody className="space-y-4 px-8 pb-8">
         {items.length === 0 && (
-          <div className="text-center py-10 border-2 border-dashed border-pencil/30 wobbly-md">
-            <p className="text-pencil/60 italic text-lg">No items yet.</p>
-            <div className="mt-3 flex justify-center">
-              <Button type="button" variant="secondary" onClick={onAdd}>
-                <Plus size={16} strokeWidth={3} /> add your first item
+          <div className="text-center py-12 rounded-2xl border border-dashed border-border bg-muted/30 transition-colors hover:bg-muted/50">
+            <p className="text-muted-foreground font-medium text-lg">No items added to this job yet.</p>
+            <div className="mt-4 flex justify-center">
+              <Button type="button" variant="secondary" onClick={onAdd} className="shadow-sm bg-white hover:bg-gray-50 border-border">
+                <Plus size={16} strokeWidth={2.5} className="mr-1" /> Add your first item
               </Button>
             </div>
           </div>
@@ -108,27 +108,27 @@ function ItemRow({
   return (
     <div
       className={cn(
-        'border-2 border-pencil wobbly-sm bg-white p-4 space-y-3',
-        'relative shadow-hand-soft',
+        'border border-border bg-card p-6 rounded-2xl space-y-4',
+        'relative shadow-sm transition-all',
       )}
     >
       {/* Row header */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="font-mono font-bold text-pencil/70 shrink-0">
+      <div className="flex items-center gap-4 flex-wrap">
+        <span className="font-mono font-bold text-muted-foreground shrink-0 bg-muted px-2 py-1 rounded max-w-fit">
           #{jobNo > 0 ? `${jobNo}-${idx + 1}` : `· ${idx + 1}`}
         </span>
         <button
           type="button"
           onClick={() => setImgOpen(true)}
           aria-label={item.imageUrl ? 'Edit image' : 'Add image'}
-          className="shrink-0 w-10 h-10 border-2 border-pencil wobbly-sm bg-white overflow-hidden grid place-items-center hover:shadow-hand-sm transition-all"
+          className="shrink-0 w-12 h-12 rounded-xl border border-border bg-muted/50 overflow-hidden grid place-items-center hover:shadow-md hover:border-muted-foreground/30 transition-all focus:outline-none focus:ring-2 focus:ring-ring"
           style={
             item.imageUrl
               ? { backgroundImage: `url(${item.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
               : undefined
           }
         >
-          {!item.imageUrl && <ImagePlus size={16} strokeWidth={2.5} className="text-pencil/60" />}
+          {!item.imageUrl && <ImagePlus size={18} strokeWidth={2} className="text-muted-foreground" />}
         </button>
         <CategoryInput
           value={item.category}
@@ -139,22 +139,22 @@ function ItemRow({
         <button
           type="button"
           onClick={() => setExpanded((e) => !e)}
-          className="text-sm text-pencil/70 hover:text-pencil flex items-center gap-1 underline decoration-dashed underline-offset-4"
+          className="text-sm font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-muted transition-all"
         >
           <ChevronDown
-            size={14}
-            strokeWidth={2.5}
-            className={cn('transition-transform', expanded && 'rotate-180')}
+            size={16}
+            strokeWidth={2}
+            className={cn('transition-transform duration-200', expanded && 'rotate-180')}
           />
-          {expanded ? 'hide details' : '+ job details'}
+          {expanded ? 'Hide Details' : 'Job Details'}
         </button>
         <button
           type="button"
           onClick={onRemove}
           aria-label="Remove item"
-          className="text-accent hover:bg-accent hover:text-white p-1.5 wobbly-sm border border-accent/60 transition-colors"
+          className="text-red-500 hover:bg-red-50 hover:text-red-600 p-2 rounded-lg border border-transparent hover:border-red-200 transition-colors focus:ring-2 focus:ring-red-500/20"
         >
-          <Trash2 size={14} strokeWidth={2.5} />
+          <Trash2 size={16} strokeWidth={2} />
         </button>
       </div>
 
@@ -163,11 +163,12 @@ function ItemRow({
           value={item.description}
           onChange={(e) => onChange({ description: e.target.value })}
           placeholder="What's being printed?"
+          className="text-lg"
         />
       </Field>
 
       {/* Quantity / Unit / Rate / Subtotal */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Field label="Qty">
           <Input
             type="number"
@@ -183,7 +184,7 @@ function ItemRow({
           <select
             value={item.unit}
             onChange={(e) => onChange({ unit: e.target.value })}
-            className="w-full text-lg bg-white border-2 border-pencil wobbly-sm px-4 py-2.5 focus:border-ink focus:ring-2 focus:ring-ink/20"
+            className="w-full bg-card border border-border rounded-xl px-4 py-2.5 text-foreground font-body text-base focus:border-transparent focus:ring-2 focus:ring-ring focus:outline-none shadow-sm transition-all"
           >
             {UNIT_OPTIONS.map((u) => (
               <option key={u} value={u}>
@@ -205,19 +206,19 @@ function ItemRow({
           />
         </Field>
         <Field label="Subtotal">
-          <div className="text-lg font-mono font-bold px-4 py-2.5 bg-muted/50 border-2 border-dashed border-pencil/40 wobbly-sm">
+          <div className="text-xl font-mono font-bold px-4 py-2.5 text-foreground bg-muted/30 border border-border rounded-xl shadow-inner flex items-center h-[46px]">
             {fmt(subtotal)}
           </div>
         </Field>
       </div>
 
       {/* Statuses */}
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Design status">
+      <div className="grid grid-cols-2 gap-4">
+        <Field label="Design Status">
           <select
             value={item.designStatus}
             onChange={(e) => onChange({ designStatus: e.target.value as DesignStatus })}
-            className="w-full text-base bg-white border-2 border-pencil wobbly-sm px-3 py-2.5 focus:border-ink"
+            className="w-full bg-card border border-border rounded-xl px-4 py-2.5 text-foreground font-body font-medium focus:border-transparent focus:ring-2 focus:ring-ring focus:outline-none shadow-sm transition-all cursor-pointer"
           >
             {DESIGN_OPTIONS.map((s) => (
               <option key={s} value={s}>
@@ -226,11 +227,11 @@ function ItemRow({
             ))}
           </select>
         </Field>
-        <Field label="Print status">
+        <Field label="Print Status">
           <select
             value={item.printStatus}
             onChange={(e) => onChange({ printStatus: e.target.value as PrintStatus })}
-            className="w-full text-base bg-white border-2 border-pencil wobbly-sm px-3 py-2.5 focus:border-ink"
+            className="w-full bg-card border border-border rounded-xl px-4 py-2.5 text-foreground font-body font-medium focus:border-transparent focus:ring-2 focus:ring-ring focus:outline-none shadow-sm transition-all cursor-pointer"
           >
             {PRINT_OPTIONS.map((s) => (
               <option key={s} value={s}>
@@ -255,11 +256,11 @@ function ItemRow({
 
       {/* Expandable details */}
       {expanded && (
-        <div className="pt-3 mt-2 border-t-2 border-dashed border-pencil/30 space-y-3">
-          <Badge tone="postit" dashed>
-            job details
+        <div className="pt-4 mt-2 border-t border-border space-y-4 animate-in slide-in-from-top-2 fade-in duration-200">
+          <Badge tone="paper" className="font-semibold px-3 py-1 bg-muted border-border text-foreground">
+            Job Details
           </Badge>
-          <div className="grid md:grid-cols-2 gap-3">
+          <div className="grid md:grid-cols-2 gap-4">
             <Field label="Size">
               <Input
                 value={item.size}
@@ -312,19 +313,19 @@ function CategoryInput({
   onChange: (v: string) => void;
 }) {
   return (
-    <>
+    <div className="flex-1 min-w-[200px] relative">
       <input
         list="product-names"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="choose or type category…"
-        className="flex-1 min-w-[180px] text-base bg-white border-2 border-pencil wobbly-sm px-3 py-1.5 focus:border-ink focus:ring-2 focus:ring-ink/20"
+        placeholder="Choose or type category…"
+        className="w-full text-foreground bg-card border border-border rounded-xl px-4 py-2 font-semibold text-lg focus:border-transparent focus:ring-2 focus:ring-ring focus:outline-none shadow-sm transition-all"
       />
       <datalist id="product-names">
         {options.map((n) => (
           <option key={n} value={n} />
         ))}
       </datalist>
-    </>
+    </div>
   );
 }

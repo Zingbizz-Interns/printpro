@@ -44,27 +44,27 @@ export function CustomerSection({ draft, onUpdate }: Props) {
   }
 
   return (
-    <Card tone="paper" wobbly="md" className="overflow-visible">
+    <Card className="overflow-visible border border-border shadow-sm rounded-3xl transition-all">
       <button
         type="button"
         onClick={() => setExpanded((e) => !e)}
-        className="w-full flex items-center gap-2 px-6 pt-5 pb-2 cursor-pointer"
+        className="w-full flex items-center justify-start gap-3 px-8 pt-6 pb-4 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-t-3xl"
       >
         <ChevronDown
-          size={18}
+          size={20}
           strokeWidth={2.5}
-          className={cn('transition-transform', !expanded && '-rotate-90')}
+          className={cn('transition-transform duration-200 text-muted-foreground', !expanded && '-rotate-90')}
         />
-        <CardTitle className="text-2xl">Customer</CardTitle>
+        <CardTitle className="text-2xl font-body font-bold text-foreground">Customer</CardTitle>
         {!expanded && draft.companyName && (
-          <span className="ml-3 font-body text-lg text-pencil/60 truncate">
+          <span className="ml-2 font-body font-medium text-lg text-muted-foreground truncate">
             — {draft.companyName}
           </span>
         )}
       </button>
 
       {expanded && (
-        <CardBody className="space-y-4">
+        <CardBody className="space-y-5 px-8 pb-8">
           <div className="relative">
             <Field label="Company / Name">
               <Input
@@ -75,17 +75,17 @@ export function CustomerSection({ draft, onUpdate }: Props) {
               />
             </Field>
             {suggestions.length > 0 && (
-              <div className="absolute z-10 mt-1 left-0 right-0 bg-white border-2 border-pencil wobbly-sm shadow-hand max-h-60 overflow-auto">
+              <div className="absolute z-50 mt-1 left-0 right-0 bg-card border border-border rounded-xl shadow-xl max-h-60 overflow-y-auto">
                 {suggestions.map((s) => (
                   <button
                     key={s.id}
                     type="button"
                     onClick={() => applySuggestion(s)}
-                    className="w-full text-left px-3 py-2 hover:bg-postit-lt border-b border-dashed border-pencil/20 last:border-b-0"
+                    className="w-full text-left px-4 py-3 hover:bg-muted transition-colors border-b border-border/50 last:border-0"
                   >
-                    <div className="font-body text-base">{s.company_name}</div>
+                    <div className="font-body font-semibold text-base text-foreground">{s.company_name}</div>
                     {s.contact_person && (
-                      <div className="text-xs text-pencil/60">
+                      <div className="text-xs text-muted-foreground mt-0.5 font-medium">
                         {s.contact_person} · {s.contact_number}
                       </div>
                     )}
@@ -95,8 +95,8 @@ export function CustomerSection({ draft, onUpdate }: Props) {
             )}
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <Field label="Contact person">
+          <div className="grid md:grid-cols-2 gap-5">
+            <Field label="Contact Person">
               <Input
                 value={draft.contactPerson}
                 onChange={(e) => onUpdate({ contactPerson: e.target.value })}
@@ -111,11 +111,11 @@ export function CustomerSection({ draft, onUpdate }: Props) {
                 inputMode="tel"
               />
             </Field>
-            <Field label="Alt. phone">
+            <Field label="Alt. Phone">
               <Input
                 value={draft.additionalContact}
                 onChange={(e) => onUpdate({ additionalContact: e.target.value })}
-                placeholder="optional"
+                placeholder="Optional"
                 inputMode="tel"
               />
             </Field>
@@ -127,7 +127,7 @@ export function CustomerSection({ draft, onUpdate }: Props) {
                 placeholder="name@company.com"
               />
             </Field>
-            <Field label="GST no." error={gstError}>
+            <Field label="GST No." error={gstError}>
               <Input
                 value={draft.gstNo}
                 onChange={(e) => onUpdate({ gstNo: e.target.value.toUpperCase() })}

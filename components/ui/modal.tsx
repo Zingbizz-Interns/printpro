@@ -13,8 +13,8 @@ interface ModalProps {
   children: ReactNode;
   footer?: ReactNode;
   /** Visual size — default `md`. */
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  /** Tilt the content card for hand-drawn charm. */
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'max';
+  /** Tilt is deprecated in Minimal Modern but kept in API for compatibility. */
   tilt?: 'l' | 'r' | 'none';
 }
 
@@ -23,10 +23,12 @@ const sizes = {
   md: 'max-w-xl',
   lg: 'max-w-3xl',
   xl: 'max-w-5xl',
+  '2xl': 'max-w-6xl',
+  max: 'max-w-[95vw]',
 };
 
 /**
- * Hand-drawn modal. Controlled — supply `open` + `onOpenChange`.
+ * Modern minimalist modal. Controlled — supply `open` + `onOpenChange`.
  * Radix handles ESC, outside click, focus trap, accessibility.
  */
 export function Modal({
@@ -37,47 +39,49 @@ export function Modal({
   children,
   footer,
   size = 'md',
-  tilt = 'none',
+  tilt = 'none', // ignored
 }: ModalProps) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-[100] bg-pencil/40 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+        <Dialog.Overlay className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 transition-opacity" />
         <Dialog.Content
           className={cn(
             'fixed left-1/2 top-1/2 z-[110] -translate-x-1/2 -translate-y-1/2',
             'w-[calc(100vw-2rem)]',
             sizes[size],
             'max-h-[calc(100vh-4rem)] overflow-y-auto',
-            'bg-white border-2 border-pencil shadow-hand-lg wobbly-md p-6',
-            tilt === 'l' && 'tilt-l',
-            tilt === 'r' && 'tilt-r',
-            'focus:outline-none',
+            'bg-card border border-border shadow-2xl rounded-3xl p-8',
+            'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
+            'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
+            'duration-200 focus:outline-none',
           )}
         >
-          <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="flex items-start justify-between gap-4 mb-6">
             <div>
-              <Dialog.Title className="font-display text-3xl leading-tight">
+              <Dialog.Title className="font-body font-bold text-2xl text-foreground tracking-tight">
                 {title}
               </Dialog.Title>
               {description && (
-                <Dialog.Description className="mt-1 text-pencil/70 text-base">
+                <Dialog.Description className="mt-1.5 text-muted-foreground text-sm">
                   {description}
                 </Dialog.Description>
               )}
             </div>
             <Dialog.Close
               aria-label="Close"
-              className="shrink-0 w-8 h-8 grid place-items-center wobbly-sm border-2 border-pencil hover:bg-accent hover:text-white hover:border-accent transition-colors"
+              className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              <X size={16} strokeWidth={2.5} />
+              <X size={18} strokeWidth={2.5} />
             </Dialog.Close>
           </div>
 
-          <div className="space-y-4">{children}</div>
+          <div className="space-y-4">
+            {children}
+          </div>
 
           {footer && (
-            <div className="mt-6 pt-4 border-t-2 border-dashed border-pencil/30 flex items-center gap-3">
+            <div className="mt-8 pt-5 border-t border-border flex items-center justify-end gap-3">
               {footer}
             </div>
           )}

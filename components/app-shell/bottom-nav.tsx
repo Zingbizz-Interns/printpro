@@ -19,15 +19,15 @@ export function BottomNav() {
     { href: '/more', Icon: MoreHorizontal, label: 'More' },
   ];
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-paper/95 backdrop-blur border-t-2 border-dashed border-pencil/40">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur-xl border-t border-border shadow-[0_-4px_24px_rgba(0,0,0,0.05)]">
       <div className="flex items-end justify-around max-w-md mx-auto px-2 pt-2 pb-[max(env(safe-area-inset-bottom),0.5rem)]">
         {items.map(({ href, Icon, label, primary }) => {
           const active = pathname?.startsWith(href);
           if (primary) {
             return (
-              <Link key={href} href={href} className="-mt-6">
-                <div className="wobbly-circle w-14 h-14 bg-accent text-white border-[3px] border-pencil grid place-items-center shadow-hand active:translate-y-1 active:shadow-hand-sm">
-                  <Icon size={24} strokeWidth={3} />
+              <Link key={href} href={href} className="-mt-6 group">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-accent text-white shadow-accent transition-transform duration-200 hover:-translate-y-1 active:scale-[0.95]">
+                  <Icon size={24} strokeWidth={2.5} />
                 </div>
               </Link>
             );
@@ -37,12 +37,12 @@ export function BottomNav() {
               key={href}
               href={href}
               className={cn(
-                'flex flex-col items-center gap-0.5 py-1 px-2 text-xs font-display',
-                active ? 'text-accent' : 'text-pencil/60',
+                'flex flex-col items-center gap-1 py-1.5 px-3 text-[11px] font-body font-medium transition-colors',
+                active ? 'text-accent' : 'text-muted-foreground hover:text-foreground',
               )}
             >
-              <Icon size={22} strokeWidth={2.5} />
-              {label}
+              <Icon size={22} strokeWidth={active ? 2.5 : 2} className={cn('transition-transform', active && '-translate-y-0.5')} />
+              <span>{label}</span>
             </Link>
           );
         })}

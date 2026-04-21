@@ -3,11 +3,10 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
-import { Thumbtack } from '@/components/decorations/thumbtack';
 import { statusTheme } from '@/lib/kanban/status-theme';
 import { daysUntilDue, deliveryLabel, isOverdueDate } from '@/lib/kanban/date-utils';
 import { jobGrandTotal, fmt } from '@/lib/domain/totals';
-import { cn, seededTilt, seededWobbly } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import type { Job } from '@/types/db';
 import { Package, Copy, Trash2, Pencil } from 'lucide-react';
 
@@ -29,9 +28,6 @@ export function JobCard({ job, onClone, onDelete, isOwner, dense }: Props) {
   const urgent = overdue || dueIn === 0;
   const paymentDone = job.paymentStatus === 'Fully Paid';
 
-  const tilt = seededTilt(String(job.id));
-  const wobbly = seededWobbly(String(job.id));
-
   return (
     <motion.div
       layout
@@ -39,84 +35,87 @@ export function JobCard({ job, onClone, onDelete, isOwner, dense }: Props) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.15 }}
-      className={cn('relative', tilt)}
+      className="relative"
     >
       <Link
         href={`/jobs/${job.id}`}
         className={cn(
-          'group block bg-white border-2 border-pencil no-underline',
-          wobbly,
-          urgent ? 'shadow-hand-accent' : 'shadow-hand-soft',
-          'hover:shadow-hand hover:-translate-y-0.5 hover:rotate-0',
-          'transition-all duration-150',
+          'group block bg-card rounded-2xl border border-border no-underline shadow-sm',
+          urgent ? 'shadow-md ring-1 ring-red-500/20' : '',
+          'hover:shadow-lg hover:-translate-y-1',
+          'transition-all duration-200 ease-out',
         )}
       >
         {/* accent strip (status colour) */}
         <div
           aria-hidden
-          className="absolute left-0 top-3 bottom-3 w-1.5 rounded-r"
+          className="absolute left-[1px] top-4 bottom-4 w-1.5 rounded-r bg-current"
           style={{ background: theme.accent }}
         />
 
-        {/* thumbtack for urgent */}
-        {urgent && !dense && <Thumbtack tone="accent" />}
+        {/* thumbtack equivalent: urgent pulse */}
+        {urgent && !dense && (
+           <div className="absolute top-0 right-3 -translate-y-1/2 rounded-full bg-red-100 p-1">
+             <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+           </div>
+        )}
 
-        <div className="pl-5 pr-3 pt-3 pb-2 flex items-start justify-between gap-2">
+        <div className="pl-6 pr-4 pt-4 pb-3 flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <div className="font-mono font-bold text-lg leading-none">#{job.jobNo}</div>
+            <div className="font-mono font-bold text-sm text-muted-foreground leading-none">#{job.jobNo}</div>
             <div
-              className="font-display text-xl leading-tight truncate mt-1"
+              className="font-body font-semibold text-lg leading-tight truncate mt-1.5"
               title={job.companyName}
             >
-              {job.companyName || <span className="text-pencil/40 italic">no customer</span>}
+              {job.companyName || <span className="text-muted-foreground/60 italic font-normal">No Customer</span>}
             </div>
           </div>
           <Badge
             tone="paper"
-            className="text-xs border-2 shrink-0"
+            className="text-[10px] sm:text-xs shrink-0 rounded-md border"
             style={{ background: theme.tint, color: theme.ink, borderColor: theme.ink }}
           >
             <span>{theme.mark}</span> {theme.label}
           </Badge>
         </div>
 
-        <div className="pl-5 pr-3 flex items-center gap-3 text-sm text-pencil/70 flex-wrap">
-          <span className="flex items-center gap-1">
-            <Package size={14} strokeWidth={2.5} /> {job.items.length}
+        <div className="pl-6 pr-4 flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
+          <span className="flex items-center gap-1.5 font-medium">
+            <Package size={14} strokeWidth={2} /> {job.items.length}
           </span>
           {job.gstEnabled && (
-            <span className="font-mono font-bold text-ink">GST</span>
+            <span className="font-mono font-bold text-blue-500 text-[10px] border border-blue-200 bg-blue-50 px-1 rounded">GST</span>
           )}
           {Number(job.discountPct) > 0 && (
-            <span className="font-mono font-bold text-amber-sketch">
+            <span className="font-mono font-bold text-amber-500 text-[10px] border border-amber-200 bg-amber-50 px-1 rounded">
               −{Number(job.discountPct)}%
             </span>
           )}
         </div>
 
-        <div className="mt-2 mx-3 border-t border-dashed border-pencil/25" />
+        <div className="mt-3 mx-4 border-t border-border/60" />
 
-        <div className="px-3 pt-2 pb-3 flex items-center gap-2">
+        <div className="px-4 pt-3 pb-4 flex items-center gap-2">
           <DeliveryPill overdue={overdue} dueIn={dueIn} label={deliveryLabel(job.deliveryDate)} delivered={job.jobStatus === 'Delivered'} />
           <div className="flex-1" />
           <div className="text-right">
             <div className="font-mono font-bold leading-none">{fmt(gt)}</div>
             {!paymentDone && balance > 0 && (
-              <div className="text-xs text-accent font-bold mt-0.5">
+              <div className="text-xs text-red-500 font-semibold mt-1">
                 due {fmt(balance)}
               </div>
             )}
             {paymentDone && (
-              <div className="text-xs text-leaf font-bold mt-0.5">✓ paid</div>
+              <div className="text-xs text-emerald-500 font-semibold mt-1">✓ Paid</div>
             )}
           </div>
         </div>
 
         {/* Hover actions */}
         {!dense && (
-          <div className="px-3 pb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center gap-1">
+          <div className="px-4 pb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5">
             <CardAction label="Edit">
-              <Pencil size={12} strokeWidth={2.5} /> edit
+              <Pencil size={12} strokeWidth={2} /> Edit
             </CardAction>
             {onClone && (
               <CardAction
@@ -127,7 +126,7 @@ export function JobCard({ job, onClone, onDelete, isOwner, dense }: Props) {
                   if (typeof job.id === 'number') onClone(job.id);
                 }}
               >
-                <Copy size={12} strokeWidth={2.5} /> clone
+                <Copy size={12} strokeWidth={2} /> Clone
               </CardAction>
             )}
             {isOwner && onDelete && (
@@ -140,7 +139,7 @@ export function JobCard({ job, onClone, onDelete, isOwner, dense }: Props) {
                   if (typeof job.id === 'number') onDelete(job.id);
                 }}
               >
-                <Trash2 size={12} strokeWidth={2.5} />
+                <Trash2 size={12} strokeWidth={2} />
               </CardAction>
             )}
           </div>
@@ -163,21 +162,21 @@ function DeliveryPill({
 }) {
   if (delivered) {
     return (
-      <span className="text-xs font-bold text-leaf bg-leaf-lt border border-leaf px-2 py-0.5 wobbly-sm">
-        ✅ delivered
+      <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+        ✅ Delivered
       </span>
     );
   }
   const cls = overdue
-    ? 'text-accent bg-accent-lt border-accent'
+    ? 'text-red-600 bg-red-50 border-red-200 font-semibold'
     : dueIn === 0
-    ? 'text-amber-sketch bg-amber-lt border-amber-sketch'
+    ? 'text-amber-600 bg-amber-50 border-amber-200 font-semibold'
     : dueIn === 1
-    ? 'text-ink bg-ink-lt border-ink'
-    : 'text-pencil/70 bg-muted border-pencil/40';
+    ? 'text-blue-600 bg-blue-50 border-blue-200 font-semibold'
+    : 'text-muted-foreground bg-muted border-border font-medium';
   const mark = overdue ? '⚠' : dueIn === 0 ? '📅' : dueIn === 1 ? '📅' : '📅';
   return (
-    <span className={cn('text-xs font-bold border px-2 py-0.5 wobbly-sm flex items-center gap-1', cls)}>
+    <span className={cn('text-xs border px-2.5 py-0.5 rounded-full flex items-center gap-1.5', cls)}>
       <span>{mark}</span>
       {label}
     </span>
@@ -200,8 +199,10 @@ function CardAction({
       onClick={onClick}
       aria-label={label}
       className={cn(
-        'kb-action wobbly-sm',
-        danger ? 'kb-action-danger' : 'kb-action-neutral',
+        'inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-lg border transition-all',
+        danger 
+          ? 'text-red-500 border-red-100 hover:bg-red-50 hover:border-red-500' 
+          : 'text-muted-foreground border-border hover:bg-muted hover:text-foreground'
       )}
     >
       {children}

@@ -12,8 +12,8 @@ export function DashedDivider({
       role="separator"
       className={cn(
         vertical
-          ? 'w-0 border-l-2 border-dashed border-pencil/40 self-stretch'
-          : 'h-0 border-t-2 border-dashed border-pencil/40 w-full',
+          ? 'w-px border-l border-border self-stretch'
+          : 'h-px border-t border-border w-full',
         className,
       )}
     />

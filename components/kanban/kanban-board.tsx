@@ -17,14 +17,10 @@ import { JobCard } from './job-card';
 import { KanbanToolbar, type Density } from './kanban-toolbar';
 import { KanbanFilters as Filters } from './kanban-filters';
 import { ColorLegend } from './color-legend';
-import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 function densityGrid(d: Density): string {
-  // auto-fit with per-card min width — cards never squeeze below readable
-  // and the column count matches the viewport. On mobile the `minmax` falls
-  // back to 1 column naturally.
   if (d === 4) return 'grid-cols-[repeat(auto-fill,minmax(300px,1fr))]';
   if (d === 6) return 'grid-cols-[repeat(auto-fill,minmax(230px,1fr))]';
   return 'grid-cols-[repeat(auto-fill,minmax(180px,1fr))]';
@@ -64,12 +60,11 @@ export function KanbanBoard() {
   }
 
   function confirmClone(id: number) {
-    // Phase 4 implements a proper clone modal; for now just route to new with query
     router.push(`/jobs/new?clone=${id}`);
   }
 
   return (
-    <div className="px-4 sm:px-6 py-6 space-y-5">
+    <div className="px-4 sm:px-8 py-8 space-y-6">
       <KanbanToolbar
         tab={filters.tab}
         onTab={(t) => patch({ tab: t })}
@@ -77,6 +72,8 @@ export function KanbanBoard() {
         density={density}
         onDensity={setDensity}
       />
+
+      <div className="h-px w-full bg-border" /> {/* Separator */}
 
       <Filters
         filters={filters}
@@ -90,11 +87,11 @@ export function KanbanBoard() {
 
       {/* Loading */}
       {jobsQ.isLoading && (
-        <div className={cn('grid gap-4', densityGrid(density))}>
+        <div className={cn('grid gap-5', densityGrid(density))}>
           {Array.from({ length: density * 2 }).map((_, i) => (
             <div
               key={i}
-              className="h-40 bg-white/70 border-2 border-dashed border-pencil/30 wobbly-md animate-pulse"
+              className="h-44 bg-muted/50 rounded-2xl border border-border animate-pulse"
             />
           ))}
         </div>
@@ -102,12 +99,12 @@ export function KanbanBoard() {
 
       {/* Error */}
       {jobsQ.isError && (
-        <Card tone="accent" wobbly="alt" tilt="l" className="p-6">
-          <CardTitle className="text-2xl text-accent">Couldn't load jobs</CardTitle>
-          <pre className="mt-2 font-mono text-sm whitespace-pre-wrap text-pencil/80">
+        <div className="p-8 bg-red-50 rounded-2xl border border-red-200">
+          <h3 className="text-2xl font-body font-semibold text-red-600">Couldn't load jobs</h3>
+          <pre className="mt-4 font-mono text-sm whitespace-pre-wrap text-red-600/80">
             {String((jobsQ.error as Error)?.message ?? jobsQ.error)}
           </pre>
-        </Card>
+        </div>
       )}
 
       {/* Empty (no jobs at all) */}
@@ -129,14 +126,14 @@ export function KanbanBoard() {
               ? 'No completed jobs match your filters.'
               : 'Try clearing the filters above.'
           }
-          actionLabel="clear filters"
+          actionLabel="Clear Filters"
           onAction={reset}
         />
       )}
 
       {/* Grid */}
       {visible.length > 0 && (
-        <div className={cn('grid gap-4', densityGrid(density))}>
+        <div className={cn('grid gap-5', densityGrid(density))}>
           <AnimatePresence mode="popLayout">
             {visible.map((j) => (
               <JobCard
@@ -167,18 +164,14 @@ function EmptyState({
   onAction: () => void;
 }) {
   return (
-    <Card tone="postit" decoration="tape" tilt="r" wobbly="alt" className="p-8 text-center max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="text-3xl">{title}</CardTitle>
-      </CardHeader>
-      <CardBody className="space-y-4">
-        <p className="text-lg text-pencil/70">{sub}</p>
-        <div className="flex justify-center">
-          <Button variant="primary" onClick={onAction}>
-            {actionLabel}
-          </Button>
-        </div>
-      </CardBody>
-    </Card>
+    <div className="p-12 text-center max-w-lg mx-auto bg-card rounded-3xl border border-border mt-10 shadow-sm">
+      <h3 className="text-3xl font-body font-bold text-foreground">{title}</h3>
+      <p className="text-lg text-muted-foreground mt-4 mb-8 leading-relaxed">{sub}</p>
+      <div className="flex justify-center">
+        <Button variant="primary" onClick={onAction}>
+          {actionLabel}
+        </Button>
+      </div>
+    </div>
   );
 }

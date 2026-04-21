@@ -4,17 +4,17 @@ import { forwardRef, type InputHTMLAttributes, type TextareaHTMLAttributes } fro
 import { cn } from '@/lib/utils';
 
 const fieldBase =
-  'w-full bg-white text-pencil font-body text-lg ' +
-  'border-2 border-pencil ' +
+  'w-full bg-card/50 backdrop-blur-sm text-foreground font-body text-base ' +
+  'border border-border rounded-xl shadow-sm ' +
   'px-4 py-2.5 ' +
-  'placeholder:text-pencil/40 placeholder:italic ' +
-  'focus:border-ink focus:ring-2 focus:ring-ink/20 ' +
-  'transition-all duration-100 ' +
-  'disabled:opacity-60 disabled:cursor-not-allowed';
+  'placeholder:text-muted-foreground placeholder:opacity-80 ' +
+  'focus:border-transparent focus:ring-2 focus:ring-ring focus:outline-none ' +
+  'transition-all duration-200 ' +
+  'disabled:opacity-50 disabled:cursor-not-allowed';
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
   ({ className, ...props }, ref) => (
-    <input ref={ref} className={cn(fieldBase, 'wobbly-sm', className)} {...props} />
+    <input ref={ref} className={cn(fieldBase, className)} {...props} />
   ),
 );
 Input.displayName = 'Input';
@@ -23,7 +23,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
   ({ className, ...props }, ref) => (
     <textarea
       ref={ref}
-      className={cn(fieldBase, 'wobbly-md resize-y min-h-[96px]', className)}
+      className={cn(fieldBase, 'resize-y min-h-[100px]', className)}
       {...props}
     />
   ),
@@ -37,7 +37,7 @@ export function Label({
   return (
     <label
       className={cn(
-        'font-display text-base text-pencil mb-1 inline-block',
+        'font-body font-semibold text-sm text-foreground mb-1.5 inline-block',
         className,
       )}
       {...props}
@@ -57,11 +57,11 @@ export function Field({
   error?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col mb-4">
       {label && <Label>{label}</Label>}
       {children}
-      {hint && !error && <span className="text-sm text-pencil/60 italic">{hint}</span>}
-      {error && <span className="text-sm text-accent font-bold">✗ {error}</span>}
+      {hint && !error && <span className="text-xs text-muted-foreground mt-1.5">{hint}</span>}
+      {error && <span className="text-xs text-red-500 font-medium mt-1.5">{error}</span>}
     </div>
   );
 }

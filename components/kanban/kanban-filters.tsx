@@ -4,18 +4,18 @@ import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ALL_STATUSES, STATUS_THEME } from '@/lib/kanban/status-theme';
 import type { JobStatus, PaymentStatus } from '@/types/db';
-import type { KanbanFilters } from '@/lib/kanban/filtering';
+import type { KanbanFilters as KFType } from '@/lib/kanban/filtering';
 
 interface Props {
-  filters: KanbanFilters;
-  onChange: (patch: Partial<KanbanFilters>) => void;
+  filters: KFType;
+  onChange: (patch: Partial<KFType>) => void;
   onReset: () => void;
   visibleCount: number;
   totalCount: number;
 }
 
 const PAY_OPTIONS: { v: PaymentStatus | ''; l: string }[] = [
-  { v: '', l: 'any payment' },
+  { v: '', l: 'Any Payment' },
   { v: 'Unpaid', l: '● Unpaid' },
   { v: 'Advance Paid', l: '⬡ Advance Paid' },
   { v: 'Fully Paid', l: '✓ Fully Paid' },
@@ -36,22 +36,22 @@ export function KanbanFilters({ filters, onChange, onReset, visibleCount, totalC
       <div className="relative flex-1 min-w-[220px] max-w-md">
         <Search
           size={16}
-          strokeWidth={2.5}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-pencil/50 pointer-events-none"
+          strokeWidth={2}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
         />
         <input
           value={filters.search}
           onChange={(e) => onChange({ search: e.target.value })}
-          placeholder="search by job #, customer, notes…"
-          className="w-full pl-9 pr-9 py-2 text-base border-2 border-pencil wobbly-sm bg-white placeholder:text-pencil/40 placeholder:italic focus:border-ink focus:ring-2 focus:ring-ink/20"
+          placeholder="Search by job #, customer, notes…"
+          className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-border bg-card placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all shadow-sm"
         />
         {filters.search && (
           <button
             onClick={() => onChange({ search: '' })}
             aria-label="Clear search"
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-pencil/50 hover:text-accent"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground bg-muted p-1 rounded-full"
           >
-            <X size={14} strokeWidth={2.5} />
+            <X size={12} strokeWidth={2.5} />
           </button>
         )}
       </div>
@@ -83,7 +83,7 @@ export function KanbanFilters({ filters, onChange, onReset, visibleCount, totalC
       <select
         value={filters.paymentStatus}
         onChange={(e) => onChange({ paymentStatus: e.target.value as PaymentStatus | '' })}
-        className="border-2 border-pencil wobbly-sm bg-white px-3 py-2 text-sm font-body focus:border-ink"
+        className="rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-ring focus:outline-none shadow-sm cursor-pointer"
       >
         {PAY_OPTIONS.map((o) => (
           <option key={o.v} value={o.v}>
@@ -96,9 +96,9 @@ export function KanbanFilters({ filters, onChange, onReset, visibleCount, totalC
       <select
         value={filters.jobStatus}
         onChange={(e) => onChange({ jobStatus: e.target.value as JobStatus | '' })}
-        className="border-2 border-pencil wobbly-sm bg-white px-3 py-2 text-sm font-body focus:border-ink"
+        className="rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-ring focus:outline-none shadow-sm cursor-pointer"
       >
-        <option value="">any status</option>
+        <option value="">Any Status</option>
         {ALL_STATUSES.map((s) => (
           <option key={s} value={s}>
             {STATUS_THEME[s].mark} {STATUS_THEME[s].label}
@@ -109,15 +109,15 @@ export function KanbanFilters({ filters, onChange, onReset, visibleCount, totalC
       {anyActive && (
         <button
           onClick={onReset}
-          className="text-sm text-accent font-bold underline decoration-dashed underline-offset-4 hover:decoration-solid"
+          className="text-sm font-medium text-accent hover:underline decoration-offset-4"
         >
-          clear filters
+          Clear filters
         </button>
       )}
 
       <div className="flex-1" />
 
-      <span className="text-sm text-pencil/60 italic font-mono">
+      <span className="text-sm text-muted-foreground font-medium bg-muted px-3 py-1 rounded-full">
         {visibleCount === totalCount
           ? `${totalCount} jobs`
           : `${visibleCount} of ${totalCount}`}
@@ -138,18 +138,18 @@ function Pill({
   children: React.ReactNode;
 }) {
   const activeCls = {
-    accent: 'bg-accent-lt text-accent border-accent',
-    amber: 'bg-amber-lt text-amber-sketch border-amber-sketch',
-    ink: 'bg-ink-lt text-ink border-ink',
+    accent: 'bg-red-50 text-red-600 border-red-200',
+    amber: 'bg-amber-50 text-amber-600 border-amber-200',
+    ink: 'bg-blue-50 text-blue-600 border-blue-200',
   }[tone];
   return (
     <button
       onClick={onClick}
       className={cn(
-        'px-3 py-1.5 text-sm font-bold border-2 wobbly-sm transition-all whitespace-nowrap',
+        'px-4 py-2 text-sm font-semibold rounded-xl border transition-all whitespace-nowrap shadow-sm',
         active
-          ? `${activeCls} shadow-hand-sm`
-          : 'bg-white text-pencil/70 border-pencil/40 border-dashed hover:border-solid hover:text-pencil',
+          ? `${activeCls} ring-1 ring-inset ring-[var(--color-ring)] ring-opacity-20`
+          : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground',
       )}
     >
       {children}

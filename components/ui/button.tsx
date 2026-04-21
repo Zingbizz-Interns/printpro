@@ -3,53 +3,47 @@
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'ink';
+type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'ink' | 'danger';
 type Size = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
-  wobbly?: 'md' | 'sm' | 'alt';
 }
 
 const base =
-  'inline-flex items-center justify-center gap-2 font-body font-bold ' +
-  'border-[3px] border-pencil select-none whitespace-nowrap ' +
-  'transition-all duration-100 ease-out ' +
+  'group inline-flex items-center justify-center gap-2 font-body font-medium ' +
+  'whitespace-nowrap rounded-xl transition-all duration-200 ease-out ' +
   'disabled:opacity-50 disabled:pointer-events-none ' +
-  'active:translate-x-[4px] active:translate-y-[4px] active:shadow-none';
+  'active:scale-[0.98] ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
 const sizes: Record<Size, string> = {
-  sm: 'px-4 py-2 text-base min-h-[40px]',
-  md: 'px-6 py-2.5 text-lg min-h-[48px]',
-  lg: 'px-8 py-3 text-xl min-h-[56px]',
+  sm: 'px-4 py-2 text-sm h-10',
+  md: 'px-6 py-2 text-base h-12',
+  lg: 'px-8 py-3 text-lg h-14',
 };
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-white text-pencil shadow-hand ' +
-    'hover:bg-accent hover:text-white hover:shadow-hand-sm hover:translate-x-[2px] hover:translate-y-[2px]',
+    'bg-gradient-to-r from-accent to-accent-secondary text-white shadow-sm ' +
+    'hover:-translate-y-0.5 hover:shadow-accent hover:brightness-110',
   secondary:
-    'bg-muted text-pencil shadow-hand ' +
-    'hover:bg-ink hover:text-white hover:shadow-hand-sm hover:translate-x-[2px] hover:translate-y-[2px]',
-  ink:
-    'bg-ink text-white shadow-hand ' +
-    'hover:bg-pencil hover:shadow-hand-sm hover:translate-x-[2px] hover:translate-y-[2px]',
-  danger:
-    'bg-accent text-white shadow-hand ' +
-    'hover:bg-pencil hover:shadow-hand-sm hover:translate-x-[2px] hover:translate-y-[2px]',
+    'bg-muted text-foreground shadow-sm hover:-translate-y-0.5 hover:bg-muted/80',
+  outline:
+    'border border-border bg-transparent hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-sm hover:text-foreground',
   ghost:
-    'bg-transparent text-pencil border-dashed shadow-none ' +
-    'hover:bg-postit hover:border-solid hover:shadow-hand-sm',
+    'bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50',
+  // Backward compatibility for old usages
+  ink: 'bg-foreground text-background shadow-sm hover:-translate-y-0.5 hover:brightness-110',
+  danger: 'bg-red-500 text-white shadow-sm hover:-translate-y-0.5 hover:bg-red-600',
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', wobbly = 'md', ...props }, ref) => {
-    const wobblyClass = wobbly === 'sm' ? 'wobbly-sm' : wobbly === 'alt' ? 'wobbly-alt' : 'wobbly-md';
+  ({ className, variant = 'primary', size = 'md', ...props }, ref) => {
     return (
       <button
         ref={ref}
-        className={cn(base, sizes[size], variants[variant], wobblyClass, className)}
+        className={cn(base, sizes[size], variants[variant], className)}
         {...props}
       />
     );

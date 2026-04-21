@@ -6,28 +6,25 @@ import { cn } from '@/lib/utils';
 type Tone = 'postit' | 'ink' | 'accent' | 'leaf';
 
 const tones: Record<Tone, string> = {
-  postit: 'bg-postit',
-  ink: 'bg-ink-lt',
-  accent: 'bg-accent-lt',
-  leaf: 'bg-leaf-lt',
+  postit: 'bg-muted text-muted-foreground border-l-4 border-l-muted-foreground/30',
+  ink: 'bg-blue-50 text-blue-800 border-l-4 border-l-blue-400',
+  accent: 'bg-indigo-50 text-indigo-800 border-l-4 border-l-indigo-400',
+  leaf: 'bg-emerald-50 text-emerald-800 border-l-4 border-l-emerald-400',
 };
 
 /**
- * Small sticky-note tag — for section labels, feature callouts.
- * Always slightly tilted, hand-drawn shadow.
+ * Replaced StickyNote with a modern informational callout block.
  */
 export function StickyNote({
   className,
   tone = 'postit',
-  tilt = 'l',
+  tilt, // deprecated
   ...props
 }: HTMLAttributes<HTMLDivElement> & { tone?: Tone; tilt?: 'l' | 'r' | 'l2' | 'r2' }) {
   return (
     <div
       className={cn(
-        'inline-block px-3 py-1 border-2 border-pencil font-display text-base',
-        'shadow-hand-sm wobbly-sm',
-        `tilt-${tilt}`,
+        'inline-block px-4 py-2 rounded-r-lg font-body text-sm font-medium shadow-sm transition-all',
         tones[tone],
         className,
       )}

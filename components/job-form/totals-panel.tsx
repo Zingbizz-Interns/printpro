@@ -4,7 +4,7 @@ import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { STATUS_THEME } from '@/lib/kanban/status-theme';
-import { fmt, itemsSubtotal } from '@/lib/domain/totals';
+import { fmt } from '@/lib/domain/totals';
 import type { Job, JobStatus, PaymentStatus } from '@/types/db';
 import { cn } from '@/lib/utils';
 
@@ -36,11 +36,11 @@ export function TotalsPanel({
   const roundDiff = grandTotal - beforeRound;
 
   return (
-    <Card tone="paper" wobbly="md" decoration="tape" className="sticky top-20">
-      <CardHeader>
-        <CardTitle className="text-2xl">Totals</CardTitle>
+    <Card className="border border-border shadow-md rounded-3xl sticky top-24 bg-card z-10 p-0 overflow-hidden">
+      <CardHeader className="px-8 pt-8 pb-4">
+        <CardTitle className="text-2xl font-body font-bold text-foreground">Totals</CardTitle>
       </CardHeader>
-      <CardBody className="space-y-4">
+      <CardBody className="space-y-6 px-8 pb-8">
         {/* GST + Discount toggles */}
         <div className="flex flex-wrap gap-3">
           <ToggleChip
@@ -55,7 +55,7 @@ export function TotalsPanel({
         </div>
 
         {/* Line items */}
-        <div className="space-y-1 font-mono text-base">
+        <div className="space-y-2.5 font-mono text-base">
           <Line label="Subtotal" value={fmt(subtotal)} />
           {draft.discountPct > 0 && (
             <Line
@@ -74,25 +74,25 @@ export function TotalsPanel({
           )}
         </div>
 
-        <div className="border-t-2 border-dashed border-pencil/40 pt-3">
+        <div className="border-t border-border pt-4">
           <div className="flex items-baseline justify-between">
-            <span className="font-display text-xl">Grand total</span>
-            <span className="font-mono font-bold text-2xl">{fmt(grandTotal)}</span>
+            <span className="font-body font-semibold text-lg text-muted-foreground uppercase tracking-widest">Grand Total</span>
+            <span className="font-mono font-bold text-3xl text-foreground">{fmt(grandTotal)}</span>
           </div>
         </div>
 
         {totalPaid > 0 && (
-          <div className="space-y-1 pt-1 border-t border-dashed border-pencil/30">
+          <div className="space-y-2 pt-3 border-t border-dashed border-border">
             <div className="flex items-baseline justify-between text-sm">
-              <span className="text-pencil/70">Paid</span>
-              <span className="font-mono text-leaf font-bold">{fmt(totalPaid)}</span>
+              <span className="text-muted-foreground font-medium uppercase tracking-widest text-[11px]">Paid</span>
+              <span className="font-mono text-emerald-600 font-bold">{fmt(totalPaid)}</span>
             </div>
             <div className="flex items-baseline justify-between">
-              <span className="font-display">Balance due</span>
+              <span className="font-body font-semibold text-muted-foreground uppercase tracking-widest text-sm">Balance Due</span>
               <span
                 className={cn(
-                  'font-mono font-bold text-xl',
-                  balance > 0.01 ? 'text-accent' : 'text-leaf',
+                  'font-mono font-bold text-2xl',
+                  balance > 0.01 ? 'text-red-500' : 'text-emerald-500',
                 )}
               >
                 {fmt(Math.max(0, balance))}
@@ -102,24 +102,26 @@ export function TotalsPanel({
         )}
 
         {/* Auto-derived statuses */}
-        <div className="pt-3 border-t-2 border-dashed border-pencil/30 space-y-2">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-sm text-pencil/60">Job status</span>
+        <div className="pt-4 border-t border-border space-y-3">
+          <div className="flex items-center justify-between gap-2 bg-muted/30 px-3 py-2 rounded-xl">
+            <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Job Status</span>
             <Badge
-              tone="paper"
-              className="text-xs border-2"
+              className="text-[10px] sm:text-xs font-semibold rounded-md flex items-center justify-center border shadow-sm px-2.5 py-1 min-h-[28px]"
               style={{
                 background: STATUS_THEME[derivedJobStatus].tint,
                 color: STATUS_THEME[derivedJobStatus].ink,
                 borderColor: STATUS_THEME[derivedJobStatus].ink,
               }}
             >
-              {STATUS_THEME[derivedJobStatus].mark} {STATUS_THEME[derivedJobStatus].label}
-              <span className="ml-1 opacity-50">auto</span>
+              <div className="flex items-center gap-1.5 leading-none">
+                <span className="text-[10px] mt-0.5">{STATUS_THEME[derivedJobStatus].mark}</span>
+                <span className="pt-px">{STATUS_THEME[derivedJobStatus].label}</span>
+                <span className="ml-1 opacity-60 font-mono tracking-widest text-[8px] uppercase border-l border-current pl-1 pt-px">Auto</span>
+              </div>
             </Badge>
           </div>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-sm text-pencil/60">Payment</span>
+          <div className="flex items-center justify-between gap-2 bg-muted/30 px-3 py-2 rounded-xl">
+            <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Payment</span>
             <Badge
               tone={
                 derivedPaymentStatus === 'Fully Paid'
@@ -128,13 +130,14 @@ export function TotalsPanel({
                   ? 'amber'
                   : 'accent'
               }
+              className="rounded-md"
             >
               {derivedPaymentStatus === 'Fully Paid'
                 ? '✓ Fully Paid'
                 : derivedPaymentStatus === 'Advance Paid'
                 ? '⬡ Advance Paid'
                 : '● Unpaid'}
-              <span className="ml-1 opacity-50">auto</span>
+              <span className="ml-1 opacity-50 font-mono text-[9px] uppercase">Auto</span>
             </Badge>
           </div>
         </div>
@@ -152,10 +155,10 @@ function Line({
   value: string;
   tone?: 'amber' | 'ink' | 'muted';
 }) {
-  const color = tone === 'amber' ? 'text-amber-sketch' : tone === 'ink' ? 'text-ink' : tone === 'muted' ? 'text-pencil/60' : 'text-pencil';
+  const color = tone === 'amber' ? 'text-amber-500' : tone === 'ink' ? 'text-blue-500' : tone === 'muted' ? 'text-muted-foreground' : 'text-foreground';
   return (
     <div className={cn('flex items-baseline justify-between', color)}>
-      <span>{label}</span>
+      <span className="font-medium text-sm">{label}</span>
       <span className="font-bold">{value}</span>
     </div>
   );
@@ -175,14 +178,16 @@ function ToggleChip({
       type="button"
       onClick={onClick}
       className={cn(
-        'px-3 py-1.5 text-sm font-bold border-2 wobbly-sm transition-all',
+        'px-4 py-2 text-sm font-semibold rounded-xl border transition-all shadow-sm',
         active
-          ? 'bg-ink-lt text-ink border-ink shadow-hand-sm'
-          : 'bg-white text-pencil/60 border-dashed border-pencil/40 hover:border-solid',
+          ? 'bg-blue-50 text-blue-700 border-blue-200 ring-1 ring-inset ring-blue-500/10'
+          : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground hover:border-muted-foreground/30',
       )}
     >
-      {active && '✓ '}
-      {label}
+      <div className="flex items-center gap-1.5">
+        {active && <span className="text-blue-500">✓</span>}
+        <span>{label}</span>
+      </div>
     </button>
   );
 }
@@ -192,32 +197,33 @@ function DiscountToggle({ value, onChange }: { value: number; onChange: (n: numb
   return (
     <div
       className={cn(
-        'flex items-center gap-1.5 px-2 py-1 text-sm font-bold border-2 wobbly-sm transition-all',
+        'flex items-center gap-2 px-3 py-1.5 text-sm font-semibold rounded-xl border transition-all shadow-sm',
         active
-          ? 'bg-amber-lt text-amber-sketch border-amber-sketch shadow-hand-sm'
-          : 'bg-white text-pencil/60 border-dashed border-pencil/40',
+          ? 'bg-amber-50 text-amber-700 border-amber-200 ring-1 ring-inset ring-amber-500/10'
+          : 'bg-card text-muted-foreground border-border hover:border-muted-foreground/30',
       )}
     >
       <button
         type="button"
         onClick={() => onChange(active ? 0 : 10)}
-        className="flex items-center gap-1"
+        className="flex items-center gap-1.5 hover:text-foreground transition-colors"
       >
-        {active && '✓ '}🏷 Discount
+        {active && <span className="text-amber-500">✓</span>}
+        <span>🏷 Discount</span>
       </button>
       {active && (
-        <>
+        <div className="flex items-center gap-1 border-l border-amber-200/50 pl-2 ml-1">
           <Input
             type="number"
             value={value}
             onChange={(e) => onChange(Math.max(0, Math.min(100, parseFloat(e.target.value) || 0)))}
-            className="!w-16 !py-0.5 !px-2 !text-sm"
+            className="w-[72px] !py-0.5 !px-2.5 text-sm font-mono h-8"
             min={0}
             max={100}
             step={0.5}
           />
-          <span>%</span>
-        </>
+          <span className="font-mono">%</span>
+        </div>
       )}
     </div>
   );

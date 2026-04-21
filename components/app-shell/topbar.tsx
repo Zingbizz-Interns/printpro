@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAuthStore } from '@/lib/auth/store';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Printer, Users, Package, TrendingUp, FileText, LogOut } from 'lucide-react';
 import { useRealtimeSync } from '@/lib/realtime';
@@ -40,19 +39,19 @@ export function Topbar() {
   if (!user) return null;
 
   return (
-    <header
-      className="sticky top-0 z-40 bg-paper/90 backdrop-blur border-b-2 border-dashed border-pencil/40"
-      style={{ backgroundImage: 'radial-gradient(var(--color-muted) 1px, transparent 1px)', backgroundSize: '24px 24px' }}
-    >
-      <div className="max-w-[1800px] mx-auto px-6 py-3 flex items-center gap-4">
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="wobbly-circle w-10 h-10 bg-ink text-white border-2 border-pencil grid place-items-center shadow-hand-sm">
-            <Printer size={18} strokeWidth={2.5} />
+    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border shadow-sm">
+      <div className="max-w-[1800px] mx-auto px-6 py-4 flex items-center gap-6">
+        <Link href="/" className="flex items-center gap-3 shrink-0">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-accent text-white shadow-accent">
+            <Printer size={20} strokeWidth={2.5} />
           </div>
-          <span className="font-display text-2xl leading-none hidden sm:block">Print Pro</span>
+          <span className="font-display text-2xl leading-none tracking-tight hidden lg:block text-foreground mt-1">Print Pro</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1 ml-6">
+        {/* Separator */}
+        <div className="hidden lg:block w-px h-6 bg-border mx-2" />
+
+        <nav className="hidden md:flex items-center gap-2">
           {nav
             .filter((n) => !n.ownerOnly || isOwner)
             .map(({ href, label, Icon }) => {
@@ -62,13 +61,13 @@ export function Topbar() {
                   key={href}
                   href={href}
                   className={cn(
-                    'flex items-center gap-2 px-3 py-1.5 font-display text-lg wobbly-sm border-2 transition-all',
+                    'flex items-center gap-2 px-4 py-2 font-body font-medium text-sm rounded-lg transition-all',
                     active
-                      ? 'nav-link-active shadow-hand-sm'
-                      : 'border-transparent hover:border-pencil/50 hover:bg-postit-lt',
+                      ? 'bg-muted text-foreground font-semibold shadow-sm'
+                      : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
                   )}
                 >
-                  <Icon size={18} strokeWidth={2.5} />
+                  <Icon size={18} strokeWidth={2} />
                   {label}
                 </Link>
               );
@@ -77,29 +76,38 @@ export function Topbar() {
 
         <div className="flex-1" />
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <LiveDot status={rtStatus} />
-          <div className="hidden sm:flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold bg-muted px-2 py-1 rounded border border-border uppercase tracking-widest text-muted-foreground">
+                {isOwner ? 'Admin' : 'Staff'}
+              </span>
+            </div>
+            
             <div
-              className="wobbly-circle w-9 h-9 grid place-items-center text-white font-display text-sm border-2 border-pencil"
-              style={{ background: user.color || '#2d5da1' }}
+              className="flex h-10 w-10 items-center justify-center rounded-full text-white font-medium text-sm border-2 border-background shadow-sm"
+              style={{ background: user.color || 'var(--color-accent)' }}
               title={`${user.name} (${user.role})`}
             >
               {initialsOf(user.name)}
             </div>
-            <Badge tone={isOwner ? 'amber' : 'ink'}>{isOwner ? '👑 Admin' : '👤 Staff'}</Badge>
           </div>
+          
+          <div className="hidden sm:block w-px h-6 bg-border mx-1" />
+
           <Button
             variant="ghost"
             size="sm"
+            className="text-muted-foreground transition-all hover:bg-red-50 hover:text-red-600"
             onClick={() => {
               logout();
               router.replace('/login');
             }}
             title="Sign out"
           >
-            <LogOut size={16} strokeWidth={2.5} />
-            <span className="hidden sm:inline">sign out</span>
+            <LogOut size={18} />
+            <span className="hidden lg:inline ml-1">Sign out</span>
           </Button>
         </div>
       </div>
@@ -112,18 +120,18 @@ function LiveDot({ status }: { status: string }) {
   return (
     <div
       className={cn(
-        'flex items-center gap-1.5 px-2 py-1 border-2 wobbly-sm text-xs font-bold',
-        on ? 'border-leaf bg-leaf-lt text-leaf' : 'border-pencil/40 bg-muted text-pencil/60',
+        'flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-mono tracking-widest uppercase shadow-sm transition-colors',
+        on ? 'border-emerald-200 bg-emerald-50 text-emerald-600' : 'border-border bg-muted text-muted-foreground',
       )}
       title={on ? 'Realtime sync active' : `Realtime: ${status.toLowerCase()}`}
     >
       <span
         className={cn(
-          'inline-block w-2 h-2 rounded-full',
-          on ? 'bg-leaf animate-pulse' : 'bg-pencil/40',
+          'inline-block w-2.5 h-2.5 rounded-full',
+          on ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground',
         )}
       />
-      {on ? 'live' : 'connecting'}
+      {on ? 'Live' : 'Connecting'}
     </div>
   );
 }

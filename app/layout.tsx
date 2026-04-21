@@ -1,18 +1,25 @@
 import type { Metadata } from 'next';
-import { Kalam, Patrick_Hand } from 'next/font/google';
+import { Calistoga, Inter, JetBrains_Mono } from 'next/font/google';
 import { Providers } from './providers';
 import './globals.css';
 
-const kalam = Kalam({
-  variable: '--font-kalam',
-  weight: ['300', '400', '700'],
+const calistoga = Calistoga({
+  variable: '--font-calistoga',
+  weight: ['400'],
   subsets: ['latin'],
   display: 'swap',
 });
 
-const patrick = Patrick_Hand({
-  variable: '--font-patrick',
-  weight: '400',
+const inter = Inter({
+  variable: '--font-inter',
+  weight: ['400', '500', '600', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-mono',
+  weight: ['400', '500'],
   subsets: ['latin'],
   display: 'swap',
 });
@@ -24,7 +31,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${kalam.variable} ${patrick.variable}`}>
+    <html lang="en" className={`${calistoga.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
       <body>
         <Providers>{children}</Providers>
       </body>
