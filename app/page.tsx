@@ -150,7 +150,7 @@ export default function Home() {
       </section>
 
       {/* ── Feature grid (Inverted Contrast Section) ───────────── */}
-      <section id="features" className="relative overflow-hidden bg-foreground py-28 text-background">
+      <section id="features" className="relative overflow-hidden bg-foreground py-28 text-white">
         {/* Dot pattern texture wrapper */}
         <div className="bg-dot-pattern absolute inset-0 opacity-[0.03] pointer-events-none" />
 
@@ -160,7 +160,7 @@ export default function Home() {
 
         <div className="relative z-10 mx-auto max-w-6xl px-6">
           <div className="mb-16 text-center">
-            <Badge tone="paper" dashed className="mb-6 border-background/20 bg-transparent text-background">
+            <Badge tone="paper" dashed className="mb-6 border-white/20 bg-transparent text-white">
               Platform Capabilities
             </Badge>
             <h2 className="font-display text-4xl md:text-5xl">Engineered for Production</h2>
@@ -295,8 +295,8 @@ function Feature({
         <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-accent text-white shadow-accent transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-110">
           <Icon size={24} strokeWidth={2} />
         </div>
-        <h3 className="mb-3 font-body text-xl font-semibold text-background">{title}</h3>
-        <p className="leading-relaxed text-background/70">{body}</p>
+        <h3 className="mb-3 font-body text-xl font-semibold text-white">{title}</h3>
+        <p className="leading-relaxed text-white/70">{body}</p>
       </CardBody>
     </Card>
   );

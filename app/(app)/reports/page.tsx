@@ -10,7 +10,6 @@ import { listJobs } from '@/lib/db/jobs';
 import { Card, CardBody } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Squiggle } from '@/components/decorations/squiggle';
 import { Input, Field } from '@/components/ui/input';
 import { fmt, jobGrandTotal, itemsSubtotal } from '@/lib/domain/totals';
 import { fmtShortDate, isOverdueDate } from '@/lib/kanban/date-utils';
@@ -22,19 +21,19 @@ import type { Job, PaymentStatus } from '@/types/db';
 type ReportType = 'all' | 'paid' | 'pending' | 'advance' | 'gst' | 'delivered';
 
 const REPORT_TYPES: { v: ReportType; l: string }[] = [
-  { v: 'all', l: 'All orders' },
-  { v: 'paid', l: '✓ Fully paid' },
+  { v: 'all', l: 'All Orders' },
+  { v: 'paid', l: '✓ Fully Paid' },
   { v: 'pending', l: '● Pending' },
-  { v: 'advance', l: '⬡ Advance paid' },
-  { v: 'gst', l: '🧾 GST only' },
+  { v: 'advance', l: '⬡ Advance Paid' },
+  { v: 'gst', l: '🧾 GST Only' },
   { v: 'delivered', l: '📦 Delivered' },
 ];
 
 const PAY_FILTERS: { v: PaymentStatus | ''; l: string }[] = [
-  { v: '', l: 'any payment' },
-  { v: 'Unpaid', l: 'unpaid' },
-  { v: 'Advance Paid', l: 'advance' },
-  { v: 'Fully Paid', l: 'fully paid' },
+  { v: '', l: 'Any Payment' },
+  { v: 'Unpaid', l: 'Unpaid' },
+  { v: 'Advance Paid', l: 'Advance Paid' },
+  { v: 'Fully Paid', l: 'Fully Paid' },
 ];
 
 export default function ReportsPage() {
@@ -104,107 +103,103 @@ export default function ReportsPage() {
   if (!isOwner) return null;
 
   return (
-    <main className="px-4 sm:px-6 py-6 space-y-6">
+    <main className="px-4 sm:px-8 py-8 space-y-8 max-w-[1800px] mx-auto">
       {/* Title */}
-      <div className="flex items-end justify-between flex-wrap gap-3">
+      <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-4xl md:text-5xl relative inline-block">
-            Pull a report
-            <Squiggle className="absolute -bottom-2 left-0 w-full h-3" />
+          <h1 className="text-4xl md:text-5xl font-body font-bold text-foreground tracking-tight">
+            Pull a Report
           </h1>
-          <p className="text-pencil/70 mt-2">Filter, scan, and export to CSV (Excel-friendly).</p>
+          <p className="text-muted-foreground mt-3 font-medium text-lg">Filter, scan, and export to CSV (Excel-friendly).</p>
         </div>
         <div className="flex gap-3 flex-wrap">
-          <Button type="button" variant="secondary" onClick={exportFiltered}>
-            <Download size={14} strokeWidth={2.5} /> export filtered
+          <Button type="button" variant="secondary" onClick={exportFiltered} className="shadow-sm border-border bg-card hover:bg-muted">
+            <Download size={16} strokeWidth={2.5} className="mr-1.5" /> Export Filtered
           </Button>
-          <Button type="button" variant="primary" onClick={exportAll}>
-            <FileDown size={14} strokeWidth={2.5} /> export all jobs
+          <Button type="button" variant="primary" onClick={exportAll} className="shadow-md">
+            <FileDown size={16} strokeWidth={2.5} className="mr-1.5" /> Export All Jobs
           </Button>
         </div>
       </div>
 
       {/* Filters card */}
-      <Card tone="paper" wobbly="md" decoration="tape" className="overflow-visible">
-        <CardBody className="space-y-4">
-          <div className="grid md:grid-cols-4 gap-4">
-            <Field label="From">
-              <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
-            </Field>
-            <Field label="To">
-              <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
-            </Field>
-            <Field label="Report type">
-              <select
-                value={type}
-                onChange={(e) => setType(e.target.value as ReportType)}
-                className="w-full text-base bg-white border-2 border-pencil wobbly-sm px-3 py-2.5 focus:border-ink focus:ring-2 focus:ring-ink/20"
-              >
-                {REPORT_TYPES.map((r) => (
-                  <option key={r.v} value={r.v}>
-                    {r.l}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field label="Payment status">
-              <select
-                value={pay}
-                onChange={(e) => setPay(e.target.value as PaymentStatus | '')}
-                className="w-full text-base bg-white border-2 border-pencil wobbly-sm px-3 py-2.5 focus:border-ink focus:ring-2 focus:ring-ink/20"
-              >
-                {PAY_FILTERS.map((p) => (
-                  <option key={p.v} value={p.v}>
-                    {p.l}
-                  </option>
-                ))}
-              </select>
-            </Field>
-          </div>
-        </CardBody>
+      <Card className="border border-border shadow-sm rounded-3xl p-8 bg-card relative z-10 w-full">
+        <div className="grid md:grid-cols-4 gap-6">
+          <Field label="From">
+            <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="shadow-inner" />
+          </Field>
+          <Field label="To">
+            <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="shadow-inner" />
+          </Field>
+          <Field label="Report Type">
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value as ReportType)}
+              className="w-full text-base bg-card border border-border rounded-xl px-4 py-2.5 font-medium shadow-inner focus:border-transparent focus:ring-2 focus:ring-ring focus:outline-none transition-all cursor-pointer"
+            >
+              {REPORT_TYPES.map((r) => (
+                <option key={r.v} value={r.v}>
+                  {r.l}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Payment Status">
+            <select
+              value={pay}
+              onChange={(e) => setPay(e.target.value as PaymentStatus | '')}
+              className="w-full text-base bg-card border border-border rounded-xl px-4 py-2.5 font-medium shadow-inner focus:border-transparent focus:ring-2 focus:ring-ring focus:outline-none transition-all cursor-pointer"
+            >
+              {PAY_FILTERS.map((p) => (
+                <option key={p.v} value={p.v}>
+                  {p.l}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
       </Card>
 
       {/* Summary tiles */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Tile label="Orders found" value={String(summary.count)} tone="paper" tilt="l" />
-        <Tile label="Total billed" value={fmt(summary.billed)} tone="ink" tilt="r" />
-        <Tile label="Collected" value={fmt(summary.collected)} tone="leaf" tilt="l2" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <Tile label="Orders Found" value={String(summary.count)} tone="muted" />
+        <Tile label="Total Billed" value={fmt(summary.billed)} tone="ink" />
+        <Tile label="Collected" value={fmt(summary.collected)} tone="leaf" />
         <Tile
           label="Pending"
           value={fmt(summary.pending)}
           tone={summary.pending > 0 ? 'accent' : 'leaf'}
-          tilt="r2"
         />
       </div>
 
       {/* Table */}
       {filtered.length === 0 ? (
-        <Card tone="postit" wobbly="alt" tilt="l" className="p-8 text-center max-w-md mx-auto">
+        <Card className="p-12 text-center max-w-md mx-auto shadow-sm border-dashed border-border rounded-3xl bg-muted/30">
           <CardBody>
-            <p className="text-lg text-pencil/70">No orders match these filters.</p>
+            <p className="text-xl text-muted-foreground font-medium">No orders match these filters.</p>
           </CardBody>
         </Card>
       ) : (
-        <div className="hd-table shadow-hand">
-          <table className="w-full text-left text-sm font-body">
-            <thead className="bg-pencil text-white font-display">
+        <div className="overflow-x-auto border border-border rounded-2xl shadow-sm bg-card">
+          <table className="w-full text-left text-sm font-body whitespace-nowrap">
+            <thead className="bg-muted text-muted-foreground font-semibold uppercase tracking-wider text-[10px] border-b border-border">
               <tr>
-                <th className="px-3 py-2">#</th>
-                <th className="px-3 py-2">Date</th>
-                <th className="px-3 py-2">Customer</th>
-                <th className="px-3 py-2">Items</th>
-                <th className="px-3 py-2">Job status</th>
-                <th className="px-3 py-2">Payment</th>
-                <th className="px-3 py-2">Delivery</th>
-                <th className="px-3 py-2 text-right">Subtotal</th>
-                <th className="px-3 py-2 text-right">GST</th>
-                <th className="px-3 py-2 text-right">Total</th>
-                <th className="px-3 py-2 text-right">Paid</th>
-                <th className="px-3 py-2 text-right">Balance</th>
-                <th className="px-3 py-2">By</th>
+                <th className="px-4 py-3">Job #</th>
+                <th className="px-4 py-3">Date</th>
+                <th className="px-4 py-3">Customer</th>
+                <th className="px-4 py-3 text-center">Items</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Payment</th>
+                <th className="px-4 py-3">Delivery</th>
+                <th className="px-4 py-3 text-right">Subtotal</th>
+                <th className="px-4 py-3 text-right">GST</th>
+                <th className="px-4 py-3 text-right">Total</th>
+                <th className="px-4 py-3 text-right">Paid</th>
+                <th className="px-4 py-3 text-right">Balance</th>
+                <th className="px-4 py-3">By</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border">
               {filtered.map((j) => {
                 const gt = jobGrandTotal(j);
                 const adv = Number(j.advancePaid) || 0;
@@ -216,47 +211,48 @@ export default function ReportsPage() {
                 const t = statusTheme(j.jobStatus);
                 const pStatus = j.paymentStatus;
                 return (
-                  <tr key={String(j.id)} className="border-t border-dashed border-pencil/30 hover:bg-postit/40">
-                    <td className="px-3 py-2 font-mono font-bold">
-                      <Link href={`/jobs/${j.id}`} className="hover:text-ink">
+                  <tr key={String(j.id)} className="hover:bg-muted/40 transition-colors">
+                    <td className="px-4 py-3 font-mono font-bold text-foreground">
+                      <Link href={`/jobs/${j.id}`} className="hover:text-blue-600 transition-colors">
                         #{j.jobNo}
                       </Link>
                     </td>
-                    <td className="px-3 py-2">{fmtShortDate(j.orderDate)}</td>
-                    <td className="px-3 py-2 truncate max-w-[180px]" title={j.companyName}>
+                    <td className="px-4 py-3 font-medium text-muted-foreground">{fmtShortDate(j.orderDate)}</td>
+                    <td className="px-4 py-3 font-medium truncate max-w-[180px] text-foreground" title={j.companyName}>
                       {j.companyName}
                     </td>
-                    <td className="px-3 py-2 text-pencil/70">{j.items.length}</td>
-                    <td className="px-3 py-2">
+                    <td className="px-4 py-3 text-center">
+                      <span className="bg-muted px-2 py-0.5 rounded-md font-mono text-xs">{j.items.length}</span>
+                    </td>
+                    <td className="px-4 py-3">
                       <Badge
-                        tone="paper"
-                        className="text-xs border-2"
+                        className="text-[10px] font-semibold border px-2 py-0.5 rounded-md shadow-sm"
                         style={{ background: t.tint, color: t.ink, borderColor: t.ink }}
                       >
                         {t.mark} {t.label}
                       </Badge>
                     </td>
-                    <td className="px-3 py-2">
-                      <Badge tone={pStatus === 'Fully Paid' ? 'leaf' : pStatus === 'Advance Paid' ? 'amber' : 'accent'} className="text-xs">
+                    <td className="px-4 py-3">
+                      <Badge tone={pStatus === 'Fully Paid' ? 'leaf' : pStatus === 'Advance Paid' ? 'amber' : 'accent'} className="text-[10px] font-semibold rounded-md">
                         {pStatus}
                       </Badge>
                     </td>
-                    <td className={cn('px-3 py-2', isOverdueDate(j.deliveryDate) && j.jobStatus !== 'Delivered' && 'text-accent font-bold')}>
+                    <td className={cn('px-4 py-3 font-medium text-muted-foreground', isOverdueDate(j.deliveryDate) && j.jobStatus !== 'Delivered' && 'text-red-500 font-bold')}>
                       {j.deliveryDate ? fmtShortDate(j.deliveryDate) : '—'}
                     </td>
-                    <td className="px-3 py-2 text-right font-mono">{fmt(sub)}</td>
-                    <td className="px-3 py-2 text-right font-mono">{j.gstEnabled ? fmt(gst) : '—'}</td>
-                    <td className="px-3 py-2 text-right font-mono font-bold">{fmt(gt)}</td>
-                    <td className="px-3 py-2 text-right font-mono text-leaf">{fmt(adv)}</td>
+                    <td className="px-4 py-3 text-right font-mono text-muted-foreground">{fmt(sub)}</td>
+                    <td className="px-4 py-3 text-right font-mono text-muted-foreground">{j.gstEnabled ? fmt(gst) : '—'}</td>
+                    <td className="px-4 py-3 text-right font-mono font-bold text-foreground">{fmt(gt)}</td>
+                    <td className="px-4 py-3 text-right font-mono text-emerald-600 font-medium">{fmt(adv)}</td>
                     <td
                       className={cn(
-                        'px-3 py-2 text-right font-mono font-bold',
-                        bal > 0.01 ? 'text-accent' : 'text-leaf',
+                        'px-4 py-3 text-right font-mono font-bold',
+                        bal > 0.01 ? 'text-red-500' : 'text-emerald-500',
                       )}
                     >
                       {fmt(Math.max(0, bal))}
                     </td>
-                    <td className="px-3 py-2 text-pencil/70">{j.createdBy || '—'}</td>
+                    <td className="px-4 py-3 font-medium text-muted-foreground">{j.createdBy || '—'}</td>
                   </tr>
                 );
               })}
@@ -327,26 +323,23 @@ function Tile({
   label,
   value,
   tone,
-  tilt,
 }: {
   label: string;
   value: string;
-  tone: 'paper' | 'ink' | 'leaf' | 'accent' | 'postit' | 'amber';
-  tilt: 'l' | 'r' | 'l2' | 'r2';
+  tone: 'muted' | 'ink' | 'leaf' | 'accent' | 'amber';
 }) {
-  const tones: Record<typeof tone, string> = {
-    paper: 'bg-white text-pencil',
-    ink: 'bg-ink-lt text-ink',
-    leaf: 'bg-leaf-lt text-leaf',
-    accent: 'bg-accent-lt text-accent',
-    postit: 'bg-postit text-pencil',
-    amber: 'bg-amber-lt text-amber-sketch',
-  };
-  const tilts = { l: 'tilt-l', r: 'tilt-r', l2: 'tilt-l2', r2: 'tilt-r2' };
+  const cls = {
+    muted: 'bg-muted/30 text-foreground border-border',
+    ink: 'bg-blue-50 text-blue-700 border-blue-100',
+    leaf: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+    accent: 'bg-red-50 text-red-700 border-red-100',
+    amber: 'bg-amber-50 text-amber-700 border-amber-100',
+  }[tone];
+  
   return (
-    <div className={cn('border-2 border-pencil shadow-hand wobbly-md p-4', tones[tone], tilts[tilt])}>
-      <div className="text-xs font-display uppercase tracking-wide opacity-60">{label}</div>
-      <div className="font-mono font-bold text-2xl mt-1">{value}</div>
+    <div className={cn(cls, 'border rounded-2xl p-6 shadow-sm')}>
+      <div className="text-[11px] font-semibold uppercase tracking-widest opacity-80">{label}</div>
+      <div className="font-mono font-bold text-3xl mt-2">{value}</div>
     </div>
   );
 }

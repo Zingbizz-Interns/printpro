@@ -89,167 +89,173 @@ export function PaymentModal({
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      size="lg"
-      tilt="r"
+      size="xl"
       title={
-        <span className="flex items-center gap-3">
-          💳 Payments
-          <span className="font-mono text-xl text-pencil/50">#{jobNo}</span>
-        </span>
+        <div className="flex items-center gap-3 font-body font-bold text-2xl tracking-tight">
+          Payments
+          <span className="font-mono text-xl text-muted-foreground bg-muted px-2 py-0.5 rounded-lg border border-border">#{jobNo}</span>
+        </div>
       }
-      description={companyName || undefined}
+      description={<span className="font-medium text-muted-foreground">{companyName || 'Unknown Customer'}</span>}
     >
-      {/* Summary strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Summary label="Total" value={fmt(grandTotal)} tone="ink" />
-        <Summary label="Advance" value={fmt(advancePaid)} tone="postit" />
-        <Summary label="Paid so far" value={fmt(totalPaid)} tone="leaf" />
-        <Summary
-          label="Balance"
-          value={fmt(Math.max(0, balance))}
-          tone={balance > 0.01 ? 'accent' : 'leaf'}
-        />
-      </div>
-
-      {/* Staff: read-only banner */}
-      {!isOwner && (
-        <div className="bg-amber-lt border-2 border-amber-sketch wobbly-sm px-4 py-2 text-amber-sketch text-sm font-bold">
-          🔒 Payment history is visible to admin only. You can see the balance above.
+      <div className="space-y-8 mt-4">
+        {/* Summary strip */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Summary label="Total" value={fmt(grandTotal)} tone="ink" />
+          <Summary label="Advance" value={fmt(advancePaid)} tone="postit" />
+          <Summary label="Paid so far" value={fmt(totalPaid)} tone="leaf" />
+          <Summary
+            label="Balance"
+            value={fmt(Math.max(0, balance))}
+            tone={balance > 0.01 ? 'accent' : 'leaf'}
+          />
         </div>
-      )}
 
-      {/* Payment list */}
-      {isOwner && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <h3 className="font-display text-xl">History</h3>
-            <Badge tone="muted" className="text-xs">
-              {payments.length + (advancePaid > 0 ? 1 : 0)} entries
-            </Badge>
+        {/* Staff: read-only banner */}
+        {!isOwner && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-amber-700 text-sm font-semibold flex items-center shadow-sm">
+            🔒 Payment history is visible to admin only. You can see the balance above.
           </div>
+        )}
 
-          <div className="hd-table">
-            <table className="w-full text-left font-body text-sm">
-              <thead className="bg-pencil text-white font-display">
-                <tr>
-                  <th className="px-3 py-2">When</th>
-                  <th className="px-3 py-2">Mode</th>
-                  <th className="px-3 py-2">Note</th>
-                  <th className="px-3 py-2 text-right">Amount</th>
-                  <th className="px-3 py-2 w-10"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {advancePaid > 0 && (
-                  <tr className="bg-leaf-lt/40 border-t border-dashed border-pencil/30">
-                    <td className="px-3 py-2">initial</td>
-                    <td className="px-3 py-2">
-                      <Badge tone="leaf" className="text-xs">
-                        ● advance
-                      </Badge>
-                    </td>
-                    <td className="px-3 py-2 text-pencil/60 italic">captured with job</td>
-                    <td className="px-3 py-2 text-right font-mono font-bold">{fmt(advancePaid)}</td>
-                    <td />
-                  </tr>
-                )}
-
-                {paymentsQ.isLoading && (
-                  <tr>
-                    <td colSpan={5} className="px-3 py-4 text-center text-pencil/50 italic">
-                      loading…
-                    </td>
-                  </tr>
-                )}
-                {!paymentsQ.isLoading && payments.length === 0 && advancePaid === 0 && (
-                  <tr>
-                    <td colSpan={5} className="px-3 py-6 text-center text-pencil/60 italic">
-                      No payments recorded yet.
-                    </td>
-                  </tr>
-                )}
-                {payments.map((p) => (
-                  <PaymentRow
-                    key={p.id}
-                    row={p}
-                    onDelete={() => {
-                      if (window.confirm('Remove this payment?')) delMut.mutate(p.id);
-                    }}
-                    deleting={delMut.isPending}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* Add payment */}
-      {isOwner && (
-        <div className="mt-2 p-4 bg-postit-lt border-2 border-dashed border-pencil/40 wobbly-sm space-y-3">
-          <h3 className="font-display text-xl">+ Add a payment</h3>
-
-          {err && (
-            <div className="text-sm font-bold text-accent bg-accent-lt border border-accent wobbly-sm px-3 py-1.5">
-              ✗ {err}
+        {/* Payment list */}
+        {isOwner && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-body font-bold text-lg tracking-tight">History</h3>
+              <Badge tone="muted" className="text-xs font-semibold px-2 py-1">
+                {payments.length + (advancePaid > 0 ? 1 : 0)} entries
+              </Badge>
             </div>
-          )}
 
-          <div className="grid md:grid-cols-4 gap-3">
-            <Field label="Amount (₹)">
-              <Input
-                type="number"
-                value={amt}
-                onChange={(e) => setAmt(e.target.value)}
-                placeholder="0.00"
-                min={0}
-                step={0.01}
-              />
-            </Field>
-            <Field label="Paid on">
-              <Input type="date" value={dt} onChange={(e) => setDt(e.target.value)} />
-            </Field>
-            <div className="md:col-span-2">
-              <Label>Mode</Label>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {MODES.map((m) => (
-                  <button
-                    key={m.v}
-                    type="button"
-                    onClick={() => setMode(m.v)}
-                    className={cn(
-                      'px-3 py-1.5 text-sm font-bold border-2 wobbly-sm transition-all',
-                      mode === m.v
-                        ? 'bg-pencil text-white border-pencil shadow-hand-sm'
-                        : 'bg-white text-pencil/70 border-dashed border-pencil/40 hover:border-solid',
-                    )}
-                  >
-                    {m.label}
-                  </button>
-                ))}
+            <div className="overflow-hidden border border-border rounded-2xl shadow-sm bg-card">
+              <table className="w-full text-left font-body text-sm whitespace-nowrap">
+                <thead className="bg-muted text-muted-foreground font-semibold uppercase tracking-wider text-[10px] border-b border-border">
+                  <tr>
+                    <th className="px-4 py-3">When</th>
+                    <th className="px-4 py-3">Mode</th>
+                    <th className="px-4 py-3 w-full">Note</th>
+                    <th className="px-4 py-3 text-right">Amount</th>
+                    <th className="px-4 py-3 w-10"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {advancePaid > 0 && (
+                    <tr className="bg-emerald-50/50 hover:bg-emerald-50 transition-colors">
+                      <td className="px-4 py-3 text-muted-foreground font-medium">initial</td>
+                      <td className="px-4 py-3">
+                        <Badge tone="leaf" className="text-[10px] font-semibold border-emerald-200">
+                          ● Advance
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground italic truncate">captured with job</td>
+                      <td className="px-4 py-3 text-right font-mono font-bold text-emerald-600">{fmt(advancePaid)}</td>
+                      <td />
+                    </tr>
+                  )}
+
+                  {paymentsQ.isLoading && (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground font-medium animate-pulse">
+                        Loading…
+                      </td>
+                    </tr>
+                  )}
+                  {!paymentsQ.isLoading && payments.length === 0 && advancePaid === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground font-medium border-dashed border-border border rounded-xl m-2 bg-muted/30">
+                        No payments recorded yet.
+                      </td>
+                    </tr>
+                  )}
+                  {payments.map((p) => (
+                    <PaymentRow
+                      key={p.id}
+                      row={p}
+                      onDelete={() => {
+                        if (window.confirm('Remove this payment?')) delMut.mutate(p.id);
+                      }}
+                      deleting={delMut.isPending}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Add payment */}
+        {isOwner && (
+          <div className="bg-card border border-border rounded-2xl shadow-sm p-6 space-y-5 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-foreground" />
+            
+            <h3 className="font-body font-bold text-xl tracking-tight">Record Payment</h3>
+
+            {err && (
+              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-600 font-semibold mb-4 text-sm flex items-center gap-2 shadow-sm">
+                <span className="text-red-500">✗</span> {err}
+              </div>
+            )}
+
+            <div className="grid md:grid-cols-4 gap-5">
+              <Field label="Amount (₹)">
+                <Input
+                  type="number"
+                  value={amt}
+                  onChange={(e) => setAmt(e.target.value)}
+                  placeholder="0.00"
+                  min={0}
+                  step={0.01}
+                  className="shadow-inner"
+                />
+              </Field>
+              <Field label="Paid on">
+                <Input type="date" value={dt} onChange={(e) => setDt(e.target.value)} className="shadow-inner" />
+              </Field>
+              <div className="md:col-span-2">
+                <Label>Mode</Label>
+                <div className="flex flex-wrap gap-2 mt-1.5">
+                  {MODES.map((m) => (
+                    <button
+                      key={m.v}
+                      type="button"
+                      onClick={() => setMode(m.v)}
+                      className={cn(
+                        'px-4 py-2 text-sm font-semibold rounded-xl border transition-all shadow-sm',
+                        mode === m.v
+                          ? 'bg-foreground text-background border-foreground ring-1 ring-inset ring-foreground/20'
+                          : 'bg-background text-muted-foreground border-border hover:bg-muted hover:text-foreground',
+                      )}
+                    >
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-          <Field label="Reference / note (optional)">
-            <Input
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="txn id, cheque #, etc."
-            />
-          </Field>
+            <Field label="Reference / Note (optional)">
+              <Input
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Txn ID, Cheque #, etc."
+                className="shadow-inner"
+              />
+            </Field>
 
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              variant="primary"
-              onClick={() => addMut.mutate()}
-              disabled={addMut.isPending}
-            >
-              {addMut.isPending ? 'saving…' : '+ record payment'}
-            </Button>
+            <div className="flex justify-end pt-2">
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => addMut.mutate()}
+                disabled={addMut.isPending}
+                className="shadow-md font-bold px-6"
+              >
+                {addMut.isPending ? 'Saving…' : '+ Record Payment'}
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </Modal>
   );
 }
@@ -264,15 +270,15 @@ function Summary({
   tone: 'ink' | 'postit' | 'leaf' | 'accent';
 }) {
   const bg = {
-    ink: 'bg-ink-lt text-ink',
-    postit: 'bg-postit text-pencil',
-    leaf: 'bg-leaf-lt text-leaf',
-    accent: 'bg-accent-lt text-accent',
+    ink: 'bg-blue-50 text-blue-700 border-blue-100',
+    postit: 'bg-amber-50 text-amber-700 border-amber-100',
+    leaf: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+    accent: 'bg-red-50 text-red-700 border-red-100',
   }[tone];
   return (
-    <div className={`${bg} border-2 border-pencil wobbly-sm px-3 py-2 shadow-hand-soft`}>
-      <div className="text-xs font-display uppercase tracking-wide opacity-70">{label}</div>
-      <div className="font-mono font-bold text-lg mt-0.5">{value}</div>
+    <div className={cn('border rounded-2xl p-4 shadow-sm', bg)}>
+      <div className="text-[10px] font-semibold uppercase tracking-widest opacity-80">{label}</div>
+      <div className="font-mono font-bold text-2xl mt-1 tracking-tight">{value}</div>
     </div>
   );
 }
@@ -290,24 +296,24 @@ function PaymentRow({
   const mode = parts[0] || 'Payment';
   const ref = parts.slice(1).join(' · ');
   return (
-    <tr className="border-t border-dashed border-pencil/30 hover:bg-postit/40">
-      <td className="px-3 py-2">{fmtShortDate(row.paid_on)}</td>
-      <td className="px-3 py-2">
-        <Badge tone="ink" className="text-xs">
+    <tr className="hover:bg-muted/40 transition-colors group">
+      <td className="px-4 py-3 font-medium text-foreground">{fmtShortDate(row.paid_on)}</td>
+      <td className="px-4 py-3">
+        <Badge tone="ink" className="text-[10px] font-semibold px-2 py-0.5 rounded-md border-blue-200 bg-blue-50">
           {mode}
         </Badge>
       </td>
-      <td className="px-3 py-2 text-pencil/70">{ref || '—'}</td>
-      <td className="px-3 py-2 text-right font-mono font-bold">{fmt(row.amount)}</td>
-      <td className="px-3 py-2">
+      <td className="px-4 py-3 text-muted-foreground truncate max-w-[200px]">{ref || '—'}</td>
+      <td className="px-4 py-3 text-right font-mono font-bold text-foreground">{fmt(row.amount)}</td>
+      <td className="px-4 py-3 text-right">
         <button
           type="button"
           onClick={onDelete}
           disabled={deleting}
           aria-label="Remove payment"
-          className="kb-action wobbly-sm kb-action-danger"
+          className="p-1.5 rounded-lg text-muted-foreground hover:bg-red-50 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
         >
-          <Trash2 size={12} strokeWidth={2.5} />
+          <Trash2 size={16} strokeWidth={2.5} />
         </button>
       </td>
     </tr>

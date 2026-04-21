@@ -9,21 +9,20 @@ import { listJobs } from '@/lib/db/jobs';
 import { Card, CardBody } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Squiggle } from '@/components/decorations/squiggle';
 import { CustomerModal } from '@/components/customers/customer-modal';
 import { LedgerModal } from '@/components/customers/ledger-modal';
 import { fmt, jobGrandTotal } from '@/lib/domain/totals';
-import { cn, seededTilt } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import type { CustomerRow } from '@/types/db';
 
 type PayFilter = '' | 'unpaid' | 'advance' | 'paid' | 'due';
 
 const FILTERS: { v: PayFilter; label: string }[] = [
-  { v: '', label: 'all' },
-  { v: 'unpaid', label: '● unpaid' },
-  { v: 'advance', label: '⬡ advance' },
-  { v: 'paid', label: '✓ fully paid' },
-  { v: 'due', label: '⚠ has dues' },
+  { v: '', label: 'All' },
+  { v: 'unpaid', label: '● Unpaid' },
+  { v: 'advance', label: '⬡ Advance' },
+  { v: 'paid', label: '✓ Fully Paid' },
+  { v: 'due', label: '⚠ Has Dues' },
 ];
 
 export default function CustomersPage() {
@@ -103,14 +102,13 @@ export default function CustomersPage() {
   }
 
   return (
-    <main className="px-4 sm:px-6 py-6 space-y-5">
-      <div className="flex items-end justify-between flex-wrap gap-3">
+    <main className="px-4 sm:px-8 py-8 space-y-8 max-w-[1800px] mx-auto">
+      <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-4xl md:text-5xl relative inline-block">
-            People we print for
-            <Squiggle className="absolute -bottom-2 left-0 w-full h-3" />
+          <h1 className="text-4xl md:text-5xl font-body font-bold text-foreground relative inline-block tracking-tight">
+            People We Print For
           </h1>
-          <p className="text-pencil/70 mt-2">Click a tile to open the customer ledger.</p>
+          <p className="text-muted-foreground mt-2 text-lg">Click a tile to open the customer ledger.</p>
         </div>
         <div className="flex gap-3">
           {isOwner && (
@@ -122,30 +120,31 @@ export default function CustomersPage() {
                   backfillMut.mutate();
               }}
               disabled={backfillMut.isPending}
+              className="shadow-sm"
             >
-              <RefreshCw size={14} strokeWidth={2.5} />
-              {backfillMut.isPending ? 'syncing…' : 'sync from jobs'}
+              <RefreshCw size={16} strokeWidth={2.5} className="mr-1.5" />
+              {backfillMut.isPending ? 'Syncing…' : 'Sync From Jobs'}
             </Button>
           )}
-          <Button type="button" variant="primary" onClick={() => setEditing(null)}>
-            <Plus size={14} strokeWidth={3} /> add customer
+          <Button type="button" variant="primary" onClick={() => setEditing(null)} className="shadow-md">
+            <Plus size={16} strokeWidth={3} className="mr-1.5" /> Add Customer
           </Button>
         </div>
       </div>
 
       {/* Search + filters */}
-      <div className="flex flex-wrap gap-3 items-center">
-        <div className="relative flex-1 min-w-[240px] max-w-md">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-pencil/50" strokeWidth={2.5} />
+      <div className="flex flex-wrap gap-4 items-center bg-card p-4 rounded-2xl border border-border shadow-sm">
+        <div className="relative flex-1 min-w-[280px] max-w-md">
+          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" strokeWidth={2} />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="search by name, phone, email…"
-            className="w-full pl-9 pr-9 py-2 border-2 border-pencil wobbly-sm bg-white placeholder:text-pencil/40 placeholder:italic focus:border-ink focus:ring-2 focus:ring-ink/20"
+            placeholder="Search by name, phone, email…"
+            className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-border bg-background placeholder:text-muted-foreground focus:border-transparent focus:ring-2 focus:ring-ring transition-all"
           />
           {search && (
-            <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-pencil/50 hover:text-accent">
-              <X size={14} strokeWidth={2.5} />
+            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <X size={16} strokeWidth={2.5} />
             </button>
           )}
         </div>
@@ -155,10 +154,10 @@ export default function CustomersPage() {
               key={f.v}
               onClick={() => setFilter(f.v)}
               className={cn(
-                'px-3 py-1.5 text-sm font-bold border-2 wobbly-sm transition-all whitespace-nowrap',
+                'px-4 py-2 text-sm font-semibold rounded-xl border transition-all shadow-sm',
                 filter === f.v
-                  ? 'bg-pencil text-white border-pencil shadow-hand-sm'
-                  : 'bg-white text-pencil/70 border-dashed border-pencil/40 hover:border-solid',
+                  ? 'bg-foreground text-white border-foreground ring-1 ring-inset ring-foreground/20'
+                  : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground',
               )}
             >
               {f.label}
@@ -166,28 +165,28 @@ export default function CustomersPage() {
           ))}
         </div>
         <div className="flex-1" />
-        <span className="text-sm text-pencil/60 italic font-mono">
+        <span className="text-sm text-muted-foreground font-mono font-medium py-1 px-3 bg-muted rounded-lg border border-border">
           {filtered.length} of {customers.length}
         </span>
       </div>
 
       {/* Grid */}
       {customersQ.isLoading ? (
-        <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]">
+        <div className="grid gap-6 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-44 bg-white/70 border-2 border-dashed border-pencil/30 wobbly-md animate-pulse" />
+            <div key={i} className="h-52 bg-muted/30 rounded-3xl border border-border animate-pulse" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <Card tone="postit" decoration="tape" tilt="r" wobbly="alt" className="p-8 text-center max-w-md mx-auto">
+        <Card className="p-12 text-center max-w-md mx-auto shadow-sm border-dashed rounded-3xl bg-muted/30">
           <CardBody>
-            <p className="text-lg text-pencil/70">
+            <p className="text-xl text-muted-foreground font-medium">
               {customers.length === 0 ? 'No customers yet.' : 'No customers match your filters.'}
             </p>
           </CardBody>
         </Card>
       ) : (
-        <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]">
+        <div className="grid gap-6 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
           {filtered.map((cu) => (
             <CustomerTile
               key={cu.id}
@@ -263,48 +262,47 @@ function CustomerTile({
       (Number(j.advancePaid) || 0)
     );
   }, 0);
-  const tilt = seededTilt(customer.company_name);
   return (
-    <div className={cn('relative', tilt)}>
+    <div className="relative group">
       <div
         onClick={onOpen}
-        className="bg-white border-2 border-pencil wobbly-md shadow-hand-soft p-4 cursor-pointer hover:shadow-hand hover:-translate-y-0.5 transition-all"
+        className="bg-card border border-border shadow-sm rounded-3xl p-6 cursor-pointer hover:shadow-lg hover:border-muted-foreground/30 transition-all duration-300 transform group-hover:-translate-y-1"
       >
-        <div className="font-display text-xl truncate" title={customer.company_name}>
+        <div className="font-body font-bold text-xl text-foreground truncate" title={customer.company_name}>
           {customer.company_name}
         </div>
         {customer.contact_person && (
-          <div className="text-sm text-pencil/70 mt-0.5 truncate">👤 {customer.contact_person}</div>
+          <div className="text-sm text-muted-foreground mt-1 truncate font-medium">👤 {customer.contact_person}</div>
         )}
-        <div className="flex flex-wrap gap-3 mt-2 text-sm text-pencil/70">
+        <div className="flex flex-wrap gap-4 mt-3 text-sm text-muted-foreground font-medium">
           {customer.contact_number && (
             <a
               href={`https://wa.me/${customer.contact_number.replace(/\D/g, '')}`}
               target="_blank"
               rel="noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1 hover:text-leaf"
+              className="flex items-center gap-1.5 hover:text-emerald-600 transition-colors"
             >
-              <Phone size={12} strokeWidth={2.5} /> {customer.contact_number}
+              <Phone size={14} strokeWidth={2} /> {customer.contact_number}
             </a>
           )}
           {customer.email_id && (
             <a
               href={`mailto:${customer.email_id}`}
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1 hover:text-ink"
+              className="flex items-center gap-1.5 hover:text-blue-600 transition-colors"
             >
-              <Mail size={12} strokeWidth={2.5} /> {customer.email_id}
+              <Mail size={14} strokeWidth={2} /> {customer.email_id}
             </a>
           )}
         </div>
-        <div className="mt-3 pt-3 border-t border-dashed border-pencil/30 grid grid-cols-3 gap-2 text-center">
-          <Stat label="orders" value={String(jobs.length)} />
-          <Stat label="billed" value={fmt(totalBilled)} tone="ink" />
-          <Stat label="due" value={fmt(totalDue)} tone={totalDue > 0.01 ? 'accent' : 'leaf'} />
+        <div className="mt-5 pt-4 border-t border-border grid grid-cols-3 gap-3 text-center">
+          <Stat label="Orders" value={String(jobs.length)} />
+          <Stat label="Billed" value={fmt(totalBilled)} tone="ink" />
+          <Stat label="Due" value={fmt(totalDue)} tone={totalDue > 0.01 ? 'accent' : 'leaf'} />
         </div>
         {(onEdit || onDelete) && (
-          <div className="mt-3 flex gap-2">
+          <div className="mt-5 flex gap-2">
             {onEdit && (
               <button
                 type="button"
@@ -312,9 +310,9 @@ function CustomerTile({
                   e.stopPropagation();
                   onEdit();
                 }}
-                className="kb-action wobbly-sm kb-action-neutral"
+                className="flex items-center justify-center p-2 rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
               >
-                <Pencil size={12} strokeWidth={2.5} /> edit
+                <Pencil size={16} strokeWidth={2} />
               </button>
             )}
             {onDelete && (
@@ -324,13 +322,13 @@ function CustomerTile({
                   e.stopPropagation();
                   onDelete();
                 }}
-                className="kb-action wobbly-sm kb-action-danger"
+                className="flex items-center justify-center p-2 rounded-xl text-red-400 hover:bg-red-50 hover:text-red-600 transition-all"
               >
-                <Trash2 size={12} strokeWidth={2.5} />
+                <Trash2 size={16} strokeWidth={2} />
               </button>
             )}
             {customer.gst_no && (
-              <Badge tone="ink" className="text-xs ml-auto" dashed>
+              <Badge tone="ink" className="text-[10px] ml-auto py-0.5 rounded-lg border shadow-sm">
                 GST
               </Badge>
             )}
@@ -350,11 +348,11 @@ function Stat({
   value: string;
   tone?: 'ink' | 'leaf' | 'accent';
 }) {
-  const color = tone === 'ink' ? 'text-ink' : tone === 'leaf' ? 'text-leaf' : tone === 'accent' ? 'text-accent' : 'text-pencil';
+  const color = tone === 'ink' ? 'text-blue-600' : tone === 'leaf' ? 'text-emerald-600' : tone === 'accent' ? 'text-red-500' : 'text-muted-foreground';
   return (
-    <div>
-      <div className={`font-mono font-bold ${color}`}>{value}</div>
-      <div className="text-[10px] uppercase tracking-wide text-pencil/50">{label}</div>
+    <div className="bg-muted/30 rounded-xl p-2">
+      <div className={`font-mono font-bold text-[15px] ${color}`}>{value}</div>
+      <div className="text-[9px] uppercase tracking-widest font-semibold text-muted-foreground mt-0.5">{label}</div>
     </div>
   );
 }

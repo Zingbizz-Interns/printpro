@@ -149,38 +149,45 @@ export function JobForm({ initial }: Props) {
   }
 
   return (
-    <div className="px-4 sm:px-6 py-6">
+    <div className="px-4 md:px-8 py-8 w-full max-w-[1800px] mx-auto">
       {/* Sticky form header */}
-      <div className="no-print sticky top-16 md:top-[68px] z-30 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 bg-paper/90 backdrop-blur border-b-2 border-dashed border-pencil/40 flex items-center gap-3 flex-wrap">
+      <div className="no-print sticky top-16 md:top-[74px] z-30 -mx-4 md:-mx-8 px-4 md:px-8 py-4 bg-background/80 backdrop-blur-xl border-b border-border flex items-center gap-4 flex-wrap shadow-sm">
         <Link href="/kanban">
-          <Button type="button" variant="ghost" size="sm">
-            <ChevronLeft size={16} strokeWidth={2.5} /> board
+          <Button type="button" variant="ghost" size="sm" className="bg-muted hover:bg-muted/80 border border-border">
+            <ChevronLeft size={16} strokeWidth={2.5} className="mr-1" /> Board
           </Button>
         </Link>
-        <StickyNote tilt="l" className="!text-base !py-0.5">
-          {isNew ? 'new job' : `job #${draft.jobNo}`}
+        
+        <div className="h-6 w-px bg-border hidden sm:block" />
+        
+        <StickyNote tone="postit" className="py-1">
+          {isNew ? 'New Job' : `Job #${draft.jobNo}`}
         </StickyNote>
+        
         {draft.createdBy && (
-          <Badge tone="muted" className="text-xs">
-            by {draft.createdBy}
+          <Badge tone="muted" className="text-xs ml-2 font-medium">
+            By {draft.createdBy}
           </Badge>
         )}
+        
         {draft._dirty && (
-          <Badge tone="accent" dashed className="text-xs">
-            unsaved
+          <Badge tone="accent" dashed className="text-xs bg-amber-50 text-amber-700 border-amber-200">
+            Unsaved Changes
           </Badge>
         )}
+        
         <div className="flex-1" />
+        
         {saveError && (
-          <div className="text-sm font-bold text-accent bg-accent-lt border-2 border-accent wobbly-sm px-3 py-1">
-            ✗ {saveError}
+          <div className="text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2 shadow-sm flex items-center gap-2">
+            <span className="text-red-500">✗</span> {saveError}
           </div>
         )}
       </div>
 
-      <div className="grid lg:grid-cols-[1fr_360px] gap-6 mt-4 items-start">
+      <div className="grid lg:grid-cols-[1fr_380px] gap-8 mt-8 items-start">
         {/* Main column */}
-        <div className="space-y-6 min-w-0">
+        <div className="space-y-8 min-w-0">
           <CustomerSection draft={draft} onUpdate={update} />
           <DeliverySection draft={draft} onUpdate={update} />
           <ItemsTable
@@ -194,7 +201,7 @@ export function JobForm({ initial }: Props) {
         </div>
 
         {/* Side column (totals sticky on desktop) */}
-        <div className="lg:sticky lg:top-[140px]">
+        <div className="lg:sticky lg:top-[160px]">
           <TotalsPanel
             draft={draft}
             subtotal={api.subtotal}

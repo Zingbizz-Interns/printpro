@@ -32,10 +32,10 @@ export default function NewJobPage() {
   if (cloneId && jobsQ.isLoading) {
     return (
       <main className="px-6 py-16">
-        <Card wobbly="alt" className="max-w-xl mx-auto p-8 text-center">
+        <Card className="max-w-xl mx-auto p-8 text-center shadow-md border-border rounded-3xl mt-16">
           <CardBody>
-            <span className="font-display text-xl text-pencil/60 animate-pulse">
-              cloning job…
+            <span className="font-body font-semibold text-xl text-muted-foreground animate-pulse">
+              Cloning job…
             </span>
           </CardBody>
         </Card>

@@ -7,6 +7,8 @@ import { fmt, jobGrandTotal } from '@/lib/domain/totals';
 import { fmtShortDate } from '@/lib/kanban/date-utils';
 import { statusTheme } from '@/lib/kanban/status-theme';
 import type { Job } from '@/types/db';
+import { cn } from '@/lib/utils';
+import { ArrowRight } from 'lucide-react';
 
 interface Props {
   open: boolean;
@@ -28,88 +30,96 @@ export function LedgerModal({ open, onOpenChange, companyName, jobs, isOwner }: 
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title={<>📒 {companyName}</>}
-      description={`${jobs.length} order${jobs.length === 1 ? '' : 's'} on file`}
-      size="xl"
-      tilt="l"
+      title={<span className="font-body font-bold text-3xl text-foreground tracking-tight">{companyName}</span>}
+      description={
+        <span className="font-medium text-muted-foreground bg-muted/50 px-2.5 py-0.5 rounded-md border border-border mt-1 inline-block">
+          {jobs.length} order{jobs.length === 1 ? '' : 's'} on file
+        </span>
+      }
+      size="2xl"
     >
-      {isOwner ? (
-        <div className="grid grid-cols-3 gap-3">
-          <Tile label="Total billed" value={fmt(totalBilled)} tone="ink" />
-          <Tile label="Total paid" value={fmt(totalPaid)} tone="leaf" />
-          <Tile
-            label="Outstanding"
-            value={fmt(totalDue)}
-            tone={totalDue > 0.01 ? 'accent' : 'leaf'}
-          />
-        </div>
-      ) : (
-        <div className="bg-amber-lt border-2 border-amber-sketch wobbly-sm px-3 py-2 text-amber-sketch text-sm font-bold">
-          🔒 Financial totals visible to admin only
-        </div>
-      )}
+      <div className="space-y-8 mt-2">
+        {isOwner ? (
+          <div className="grid grid-cols-3 gap-6">
+            <Tile label="Total Billed" value={fmt(totalBilled)} tone="ink" />
+            <Tile label="Total Paid" value={fmt(totalPaid)} tone="leaf" />
+            <Tile
+              label="Outstanding"
+              value={fmt(totalDue)}
+              tone={totalDue > 0.01 ? 'accent' : 'leaf'}
+            />
+          </div>
+        ) : (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-amber-700 text-sm font-semibold flex items-center shadow-sm">
+            🔒 Financial totals visible to admin only
+          </div>
+        )}
 
-      {jobs.length === 0 ? (
-        <p className="text-pencil/60 italic text-center py-6">No orders for this customer yet.</p>
-      ) : (
-        <div className="hd-table">
-          <table className="w-full text-left font-body text-sm">
-            <thead className="bg-pencil text-white font-display">
-              <tr>
-                <th className="px-3 py-2">Job #</th>
-                <th className="px-3 py-2">Date</th>
-                <th className="px-3 py-2">Items</th>
-                <th className="px-3 py-2">Status</th>
-                {isOwner && <th className="px-3 py-2 text-right">Total</th>}
-                {isOwner && <th className="px-3 py-2 text-right">Balance</th>}
-                <th className="px-3 py-2 w-10"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {jobs.map((j) => {
-                const gt = jobGrandTotal(j);
-                const bal = gt - (Number(j.advancePaid) || 0);
-                const t = statusTheme(j.jobStatus);
-                return (
-                  <tr key={String(j.id)} className="border-t border-dashed border-pencil/30 hover:bg-postit/40">
-                    <td className="px-3 py-2 font-mono font-bold">#{j.jobNo}</td>
-                    <td className="px-3 py-2">{fmtShortDate(j.orderDate)}</td>
-                    <td className="px-3 py-2 text-pencil/70">{j.items.length}</td>
-                    <td className="px-3 py-2">
-                      <Badge
-                        tone="paper"
-                        className="text-xs border-2"
-                        style={{ background: t.tint, color: t.ink, borderColor: t.ink }}
-                      >
-                        {t.mark} {t.label}
-                      </Badge>
-                    </td>
-                    {isOwner && (
-                      <td className="px-3 py-2 text-right font-mono">{fmt(gt)}</td>
-                    )}
-                    {isOwner && (
-                      <td
-                        className={`px-3 py-2 text-right font-mono font-bold ${bal > 0.01 ? 'text-accent' : 'text-leaf'}`}
-                      >
-                        {fmt(Math.max(0, bal))}
+        {jobs.length === 0 ? (
+          <div className="text-center py-12 bg-muted/30 rounded-2xl border border-dashed border-border">
+            <p className="text-muted-foreground font-medium">No orders for this customer yet.</p>
+          </div>
+        ) : (
+          <div className="overflow-hidden border border-border rounded-2xl shadow-sm bg-card">
+            <table className="w-full text-left font-body text-sm whitespace-nowrap">
+              <thead className="bg-muted text-muted-foreground font-semibold uppercase tracking-wider text-[10px] border-b border-border">
+                <tr>
+                  <th className="px-5 py-3">Job #</th>
+                  <th className="px-5 py-3">Date</th>
+                  <th className="px-5 py-3 text-center">Items</th>
+                  <th className="px-5 py-3">Status</th>
+                  {isOwner && <th className="px-5 py-3 text-right">Total</th>}
+                  {isOwner && <th className="px-5 py-3 text-right">Balance</th>}
+                  <th className="px-5 py-3 w-10"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {jobs.map((j) => {
+                  const gt = jobGrandTotal(j);
+                  const bal = gt - (Number(j.advancePaid) || 0);
+                  const t = statusTheme(j.jobStatus);
+                  return (
+                    <tr key={String(j.id)} className="hover:bg-muted/40 transition-colors group">
+                      <td className="px-5 py-3.5 font-mono font-bold text-foreground">#{j.jobNo}</td>
+                      <td className="px-5 py-3.5 text-muted-foreground font-medium">{fmtShortDate(j.orderDate)}</td>
+                      <td className="px-5 py-3.5 text-center">
+                        <span className="bg-muted px-2 py-0.5 rounded-md font-mono text-xs">{j.items.length}</span>
                       </td>
-                    )}
-                    <td className="px-3 py-2">
-                      <Link
-                        href={`/jobs/${j.id}`}
-                        onClick={() => onOpenChange(false)}
-                        className="kb-action wobbly-sm kb-action-neutral"
-                      >
-                        open →
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+                      <td className="px-5 py-3.5">
+                        <Badge
+                          className="text-[10px] font-semibold border px-2 py-0.5 rounded-md shadow-sm"
+                          style={{ background: t.tint, color: t.ink, borderColor: t.ink }}
+                        >
+                          {t.mark} {t.label}
+                        </Badge>
+                      </td>
+                      {isOwner && (
+                        <td className="px-5 py-3.5 text-right font-mono font-medium text-foreground">{fmt(gt)}</td>
+                      )}
+                      {isOwner && (
+                        <td
+                          className={`px-5 py-3.5 text-right font-mono font-bold ${bal > 0.01 ? 'text-red-500' : 'text-emerald-500'}`}
+                        >
+                          {fmt(Math.max(0, bal))}
+                        </td>
+                       )}
+                      <td className="px-5 py-3.5 text-right">
+                        <Link
+                          href={`/jobs/${j.id}`}
+                          onClick={() => onOpenChange(false)}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-all bg-muted hover:bg-border px-2 py-1 rounded-md"
+                        >
+                          Open <ArrowRight size={12} strokeWidth={2.5} />
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </Modal>
   );
 }
@@ -124,14 +134,15 @@ function Tile({
   tone: 'ink' | 'leaf' | 'accent';
 }) {
   const cls = {
-    ink: 'bg-ink-lt text-ink',
-    leaf: 'bg-leaf-lt text-leaf',
-    accent: 'bg-accent-lt text-accent',
+    ink: 'bg-blue-50 text-blue-700 border-blue-100',
+    leaf: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+    accent: 'bg-red-50 text-red-700 border-red-100',
   }[tone];
+  
   return (
-    <div className={`${cls} border-2 border-pencil wobbly-sm px-3 py-2 shadow-hand-soft`}>
-      <div className="text-xs font-display uppercase tracking-wide opacity-70">{label}</div>
-      <div className="font-mono font-bold text-xl mt-0.5">{value}</div>
+    <div className={cn(cls, 'border rounded-2xl p-5 shadow-sm')}>
+      <div className="text-[11px] font-semibold uppercase tracking-widest opacity-80">{label}</div>
+      <div className="font-mono font-bold text-3xl mt-2">{value}</div>
     </div>
   );
 }

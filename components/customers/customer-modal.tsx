@@ -79,31 +79,31 @@ export function CustomerModal({ open, onOpenChange, customer }: Props) {
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title={editing ? 'Edit customer' : 'Add customer'}
-      tilt={editing ? 'r' : 'l'}
+      title={editing ? 'Edit Customer' : 'Add Customer'}
       footer={
         <>
           <div className="flex-1" />
           <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
-            cancel
+            Cancel
           </Button>
           <Button
             type="button"
             variant="primary"
             onClick={() => mut.mutate()}
             disabled={mut.isPending}
+            className="shadow-md"
           >
-            {mut.isPending ? 'saving…' : editing ? 'save changes' : 'add customer'}
+            {mut.isPending ? 'Saving…' : editing ? 'Save Changes' : 'Add Customer'}
           </Button>
         </>
       }
     >
       {err && (
-        <div className="bg-accent-lt border-2 border-accent wobbly-sm px-3 py-2 text-accent font-bold">
-          ✗ {err}
+        <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-600 font-semibold mb-4 text-sm flex items-center gap-2 shadow-sm">
+          <span className="text-red-500">✗</span> {err}
         </div>
       )}
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 gap-5 mt-2">
         <div className="md:col-span-2">
           <Field label="Company / Name">
             <Input
@@ -114,7 +114,7 @@ export function CustomerModal({ open, onOpenChange, customer }: Props) {
             />
           </Field>
         </div>
-        <Field label="Contact person">
+        <Field label="Contact Person">
           <Input
             value={data.contact_person}
             onChange={(e) => update('contact_person', e.target.value)}
@@ -127,7 +127,7 @@ export function CustomerModal({ open, onOpenChange, customer }: Props) {
             inputMode="tel"
           />
         </Field>
-        <Field label="Alt. phone">
+        <Field label="Alt. Phone">
           <Input
             value={data.additional_contact}
             onChange={(e) => update('additional_contact', e.target.value)}
@@ -141,7 +141,7 @@ export function CustomerModal({ open, onOpenChange, customer }: Props) {
             onChange={(e) => update('email_id', e.target.value)}
           />
         </Field>
-        <Field label="GST no.">
+        <Field label="GST No.">
           <Input
             value={data.gst_no}
             onChange={(e) => update('gst_no', e.target.value.toUpperCase())}

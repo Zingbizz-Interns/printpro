@@ -9,7 +9,6 @@ import { Card, CardBody } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Squiggle } from '@/components/decorations/squiggle';
 import { cn } from '@/lib/utils';
 
 export default function ProductsPage() {
@@ -84,22 +83,21 @@ export default function ProductsPage() {
   });
 
   return (
-    <main className="px-4 sm:px-6 py-6 space-y-5 max-w-3xl mx-auto">
+    <main className="px-4 sm:px-8 py-8 space-y-8 max-w-4xl mx-auto">
       <div>
-        <h1 className="text-4xl md:text-5xl relative inline-block">
-          What we print
-          <Squiggle className="absolute -bottom-2 left-0 w-full h-3" />
+        <h1 className="text-4xl md:text-5xl font-body font-bold text-foreground tracking-tight">
+          What We Print
         </h1>
-        <p className="text-pencil/70 mt-2">
+        <p className="text-muted-foreground mt-3 font-medium text-lg">
           Renaming a product cascades to every existing item that uses it.
         </p>
       </div>
 
       {/* Search + add */}
       {isOwner && (
-        <div className="bg-postit-lt border-2 border-dashed border-pencil/40 wobbly-sm p-4">
-          <label className="font-display text-lg">+ Add product</label>
-          <div className="flex gap-3 mt-2 flex-wrap">
+        <div className="bg-card border border-border shadow-sm rounded-3xl p-6">
+          <label className="font-body font-bold text-lg text-foreground block mb-4">Add Product Category</label>
+          <div className="flex gap-4 flex-wrap">
             <Input
               value={adding}
               onChange={(e) => {
@@ -108,62 +106,65 @@ export default function ProductsPage() {
               }}
               onKeyDown={(e) => e.key === 'Enter' && addMut.mutate()}
               placeholder="e.g. Visiting Card, Banner, Brochure…"
-              className="flex-1 min-w-[200px]"
+              className="flex-1 min-w-[240px] shadow-inner"
             />
             <Button
               type="button"
               variant="primary"
               onClick={() => addMut.mutate()}
               disabled={addMut.isPending || !adding.trim()}
+              className="shadow-md"
             >
-              <Plus size={14} strokeWidth={3} /> add
+              <Plus size={16} strokeWidth={2.5} className="mr-1.5" /> Add
             </Button>
           </div>
           {err && (
-            <div className="mt-2 text-sm font-bold text-accent bg-accent-lt border border-accent wobbly-sm px-3 py-1.5">
-              ✗ {err}
+            <div className="mt-4 text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2 flex items-center gap-2 shadow-sm">
+              <span className="text-red-500">✗</span> {err}
             </div>
           )}
         </div>
       )}
 
       <div className="relative">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-pencil/50" strokeWidth={2.5} />
+        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" strokeWidth={2} />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="search products…"
-          className="w-full pl-9 pr-9 py-2 border-2 border-pencil wobbly-sm bg-white placeholder:text-pencil/40 placeholder:italic focus:border-ink focus:ring-2 focus:ring-ink/20"
+          placeholder="Search products…"
+          className="w-full pl-11 pr-11 py-3 border border-border rounded-xl bg-card shadow-sm placeholder:text-muted-foreground focus:border-transparent focus:ring-2 focus:ring-ring transition-all"
         />
         {search && (
-          <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-pencil/50 hover:text-accent">
-            <X size={14} strokeWidth={2.5} />
+          <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+            <X size={16} strokeWidth={2.5} />
           </button>
         )}
       </div>
 
       {productsQ.isLoading ? (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-12 bg-white/70 border-2 border-dashed border-pencil/30 wobbly-sm animate-pulse" />
+            <div key={i} className="h-16 bg-muted/30 border border-border rounded-xl animate-pulse" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <Card tone="postit" decoration="tape" tilt="l" className="p-6 text-center">
+        <Card className="p-12 text-center rounded-3xl bg-muted/30 border-dashed border-border shadow-sm">
           <CardBody>
-            <p className="text-pencil/70">
+            <p className="text-xl text-muted-foreground font-medium">
               {products.length === 0 ? 'No products yet.' : 'Nothing matches your search.'}
             </p>
           </CardBody>
         </Card>
       ) : (
-        <ol className="space-y-2">
+        <ol className="space-y-3">
           {filtered.map((p, i) => (
             <li
               key={p.id}
-              className="flex items-center gap-3 bg-white border-2 border-pencil wobbly-sm shadow-hand-soft px-4 py-2 hover:shadow-hand transition-all"
+              className="flex items-center gap-4 bg-card border border-border rounded-xl shadow-sm px-6 py-4 hover:shadow-md transition-all group"
             >
-              <span className="font-mono text-pencil/50 w-8 shrink-0">{String(i + 1).padStart(2, '0')}.</span>
+              <span className="font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded flex-shrink-0 font-medium">
+                {String(i + 1).padStart(2, '0')}
+              </span>
 
               {editing?.id === p.id ? (
                 <>
@@ -175,66 +176,72 @@ export default function ProductsPage() {
                       if (e.key === 'Enter') renameMut.mutate();
                       if (e.key === 'Escape') setEditing(null);
                     }}
-                    className="flex-1"
+                    className="flex-1 min-w-0"
                   />
-                  <button
-                    type="button"
-                    onClick={() => renameMut.mutate()}
-                    disabled={renameMut.isPending}
-                    className={cn('kb-action wobbly-sm kb-action-neutral')}
-                  >
-                    <Check size={12} strokeWidth={3} /> save
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditing(null)}
-                    className="text-sm text-pencil/60 underline decoration-dashed"
-                  >
-                    cancel
-                  </button>
+                  <div className="flex gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => renameMut.mutate()}
+                      disabled={renameMut.isPending}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-white font-semibold rounded-lg text-sm hover:bg-foreground/90 transition-colors shadow-sm"
+                    >
+                      <Check size={14} strokeWidth={3} /> Save
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditing(null)}
+                      className="px-3 py-1.5 text-sm font-semibold text-muted-foreground hover:bg-muted rounded-lg transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </>
               ) : confirmDel === p.id ? (
                 <>
-                  <span className="flex-1 text-accent font-bold">Delete "{p.name}"?</span>
-                  <button
-                    type="button"
-                    onClick={() => delMut.mutate(p.id)}
-                    disabled={delMut.isPending}
-                    className="kb-action wobbly-sm kb-action-danger"
-                  >
-                    yes, delete
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setConfirmDel(null)}
-                    className="text-sm text-pencil/60 underline decoration-dashed"
-                  >
-                    cancel
-                  </button>
+                  <span className="flex-1 text-red-500 font-bold min-w-0 truncate">Delete "{p.name}"?</span>
+                  <div className="flex gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => delMut.mutate(p.id)}
+                      disabled={delMut.isPending}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500 text-white font-semibold rounded-lg text-sm hover:bg-red-600 transition-colors shadow-sm"
+                    >
+                      <Trash2 size={14} strokeWidth={2} /> Yes, delete
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDel(null)}
+                      className="px-3 py-1.5 text-sm font-semibold text-muted-foreground hover:bg-muted rounded-lg transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </>
               ) : (
                 <>
-                  <span className="flex-1 font-body text-lg">{p.name}</span>
+                  <span className="flex-1 font-body font-bold text-lg text-foreground min-w-0 truncate">
+                    {p.name}
+                  </span>
                   {isOwner ? (
-                    <>
+                    <div className="flex gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         type="button"
                         onClick={() => setEditing({ id: p.id, name: p.name })}
-                        className="kb-action wobbly-sm kb-action-neutral"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-muted text-muted-foreground hover:text-foreground hover:bg-border transition-all"
                       >
-                        <Pencil size={12} strokeWidth={2.5} /> rename
+                        <Pencil size={14} strokeWidth={2} /> Rename
                       </button>
                       <button
                         type="button"
                         onClick={() => setConfirmDel(p.id)}
-                        className="kb-action wobbly-sm kb-action-danger"
+                        className="flex items-center justify-center p-1.5 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-all"
                         aria-label="Delete"
                       >
-                        <Trash2 size={12} strokeWidth={2.5} />
+                        <Trash2 size={16} strokeWidth={2} />
                       </button>
-                    </>
+                    </div>
                   ) : (
-                    <Badge tone="muted" className="text-xs">read-only</Badge>
+                    <Badge tone="muted" className="text-xs shrink-0">Read-Only</Badge>
                   )}
                 </>
               )}

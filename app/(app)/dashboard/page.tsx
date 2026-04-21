@@ -8,8 +8,6 @@ import { useAuthStore } from '@/lib/auth/store';
 import { listJobs } from '@/lib/db/jobs';
 import { Card, CardBody } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Squiggle } from '@/components/decorations/squiggle';
-import { Thumbtack } from '@/components/decorations/thumbtack';
 import { fmt, jobGrandTotal } from '@/lib/domain/totals';
 import { fmtShortDate, isOverdueDate, isDueToday } from '@/lib/kanban/date-utils';
 import { statusTheme } from '@/lib/kanban/status-theme';
@@ -20,14 +18,14 @@ import {
   periodRange,
   type Period,
 } from '@/lib/dashboard/period';
-import { cn, seededTilt } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import type { Job, PaymentStatus } from '@/types/db';
 
 const PAY_FILTERS: { v: PaymentStatus | ''; l: string }[] = [
-  { v: '', l: 'all' },
-  { v: 'Unpaid', l: '● unpaid' },
-  { v: 'Advance Paid', l: '⬡ advance' },
-  { v: 'Fully Paid', l: '✓ paid' },
+  { v: '', l: 'All' },
+  { v: 'Unpaid', l: '● Unpaid' },
+  { v: 'Advance Paid', l: '⬡ Advance' },
+  { v: 'Fully Paid', l: '✓ Paid' },
 ];
 
 export default function DashboardPage() {
@@ -74,28 +72,26 @@ export default function DashboardPage() {
   if (!isOwner) return null;
 
   return (
-    <main className="px-4 sm:px-6 py-6 space-y-6">
+    <main className="px-4 sm:px-8 py-8 space-y-8 max-w-[1800px] mx-auto">
       {/* Title */}
-      <div className="flex items-end justify-between flex-wrap gap-3">
+      <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-4xl md:text-5xl relative inline-block">
+          <h1 className="text-4xl md:text-5xl font-body font-bold text-foreground tracking-tight">
             How's the shop doing?
-            <Squiggle className="absolute -bottom-2 left-0 w-full h-3" />
           </h1>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="inline-flex items-center bg-white border-2 border-pencil wobbly-md shadow-hand-soft overflow-hidden">
-          {PERIODS.map((p, i) => (
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="inline-flex items-center bg-muted/50 p-1 border border-border rounded-xl">
+          {PERIODS.map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
               className={cn(
-                'kb-tab text-sm',
-                period === p ? 'kb-tab-active' : 'kb-tab-idle',
-                i > 0 && 'border-l border-pencil/40',
+                'px-4 py-2 text-sm font-semibold rounded-lg transition-all',
+                period === p ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-muted/80',
               )}
             >
               {PERIOD_LABELS[p]}
@@ -109,10 +105,10 @@ export default function DashboardPage() {
               key={f.v}
               onClick={() => setPay(f.v)}
               className={cn(
-                'px-3 py-1.5 text-sm font-bold border-2 wobbly-sm transition-all whitespace-nowrap',
+                'px-4 py-2 text-sm font-semibold rounded-xl border transition-all shadow-sm',
                 pay === f.v
-                  ? 'bg-pencil text-white border-pencil shadow-hand-sm'
-                  : 'bg-white text-pencil/70 border-dashed border-pencil/40 hover:border-solid',
+                  ? 'bg-foreground text-white border-foreground ring-1 ring-inset ring-foreground/20'
+                  : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground',
               )}
             >
               {f.l}
@@ -121,88 +117,80 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex-1" />
-        <span className="text-sm text-pencil/60 italic font-mono">
+        <span className="text-sm font-mono font-medium py-1.5 px-3 bg-muted text-muted-foreground rounded-lg border border-border">
           {filtered.length} job{filtered.length === 1 ? '' : 's'} in view
         </span>
       </div>
 
       {jobsQ.isError && (
-        <Card tone="accent" wobbly="alt" className="p-5">
-          <CardBody>
-            <p className="text-accent font-bold">Couldn't load jobs.</p>
-          </CardBody>
-        </Card>
+        <div className="bg-red-50 border border-red-200 text-red-600 font-semibold px-6 py-4 rounded-xl shadow-sm text-center">
+          Couldn't load jobs.
+        </div>
       )}
 
       {/* Stat tiles — 8 of them */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-        <Tile label="Orders" value={String(stats.orders)} tone="paper" tilt="l" />
-        <Tile label="Revenue" value={fmt(stats.revenue)} tone="ink" tilt="r" big />
-        <Tile label="Collected" value={fmt(stats.collected)} tone="leaf" tilt="l2" big />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <Tile label="Orders" value={String(stats.orders)} tone="muted" />
+        <Tile label="Revenue" value={fmt(stats.revenue)} tone="ink" />
+        <Tile label="Collected" value={fmt(stats.collected)} tone="leaf" />
         <Tile
-          label="Pending due"
+          label="Pending Due"
           value={fmt(stats.pending)}
           tone={stats.pending > 0 ? 'accent' : 'leaf'}
-          tilt="r2"
-          big
-          tack={stats.pending > 0}
         />
-        <Tile label="Today's orders" value={String(stats.today)} tone="postit" tilt="r" />
+        <Tile label="Today's Orders" value={String(stats.today)} tone="amber" />
         <Tile
           label="Overdue"
           value={String(stats.overdue)}
           tone={stats.overdue > 0 ? 'accent' : 'muted'}
-          tilt="l"
-          tack={stats.overdue > 0}
         />
-        <Tile label="GST bills" value={String(stats.gstCount)} tone="ink" tilt="r2" />
-        <Tile label="GST amount" value={fmt(stats.gstAmt)} tone="amber" tilt="l2" big />
+        <Tile label="GST Bills" value={String(stats.gstCount)} tone="ink" />
+        <Tile label="GST Amount" value={fmt(stats.gstAmt)} tone="amber" />
       </div>
 
       {/* Two-column tables */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-8">
         {/* Recent orders */}
         <section>
-          <h2 className="text-2xl font-display mb-3 flex items-center gap-3">
-            Recent orders
-            <Badge tone="muted" className="text-xs">last {recent.length}</Badge>
+          <h2 className="text-2xl font-body font-bold mb-4 flex items-center gap-3 text-foreground tracking-tight">
+            Recent Orders
+            <Badge tone="muted" className="text-xs font-semibold py-1">Last {recent.length}</Badge>
           </h2>
           {recent.length === 0 ? (
             <EmptyMini text="No orders in this range." />
           ) : (
-            <div className="hd-table shadow-hand-soft">
-              <table className="w-full text-left text-sm font-body">
-                <thead className="bg-pencil text-white font-display">
+            <div className="overflow-x-auto border border-border rounded-2xl shadow-sm bg-card">
+              <table className="w-full text-left text-sm font-body whitespace-nowrap">
+                <thead className="bg-muted text-muted-foreground font-semibold uppercase tracking-wider text-[10px] border-b border-border">
                   <tr>
-                    <th className="px-3 py-2">#</th>
-                    <th className="px-3 py-2">Customer</th>
-                    <th className="px-3 py-2">Status</th>
-                    <th className="px-3 py-2 text-right">Total</th>
+                    <th className="px-5 py-3">#</th>
+                    <th className="px-5 py-3">Customer</th>
+                    <th className="px-5 py-3">Status</th>
+                    <th className="px-5 py-3 text-right">Total</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-border">
                   {recent.map((j) => {
                     const t = statusTheme(j.jobStatus);
                     return (
-                      <tr key={String(j.id)} className="border-t border-dashed border-pencil/30 hover:bg-postit/40">
-                        <td className="px-3 py-2 font-mono font-bold">
-                          <Link href={`/jobs/${j.id}`} className="hover:text-ink">
+                      <tr key={String(j.id)} className="hover:bg-muted/40 transition-colors">
+                        <td className="px-5 py-3.5 font-mono font-bold text-foreground">
+                          <Link href={`/jobs/${j.id}`} className="hover:text-blue-600 transition-colors">
                             #{j.jobNo}
                           </Link>
                         </td>
-                        <td className="px-3 py-2 truncate max-w-[220px]" title={j.companyName}>
-                          {j.companyName || <span className="text-pencil/40 italic">no name</span>}
+                        <td className="px-5 py-3.5 font-medium truncate max-w-[220px] text-foreground" title={j.companyName}>
+                          {j.companyName || <span className="text-muted-foreground italic">No Name</span>}
                         </td>
-                        <td className="px-3 py-2">
+                        <td className="px-5 py-3.5">
                           <Badge
-                            tone="paper"
-                            className="text-xs border-2"
+                            className="text-[10px] font-semibold border px-2 py-0.5 rounded-md shadow-sm"
                             style={{ background: t.tint, color: t.ink, borderColor: t.ink }}
                           >
                             {t.mark} {t.label}
                           </Badge>
                         </td>
-                        <td className="px-3 py-2 text-right font-mono font-bold">
+                        <td className="px-5 py-3.5 text-right font-mono font-bold text-foreground">
                           {fmt(jobGrandTotal(j))}
                         </td>
                       </tr>
@@ -216,47 +204,47 @@ export default function DashboardPage() {
 
         {/* Pending collections */}
         <section>
-          <h2 className="text-2xl font-display mb-3 flex items-center gap-3">
-            Pending collections
-            <Badge tone={pending.length > 0 ? 'accent' : 'leaf'} className="text-xs">
+          <h2 className="text-2xl font-body font-bold mb-4 flex items-center gap-3 text-foreground tracking-tight">
+            Pending Collections
+            <Badge tone={pending.length > 0 ? 'accent' : 'leaf'} className="text-xs font-semibold py-1">
               {pending.length}
             </Badge>
           </h2>
           {pending.length === 0 ? (
             <EmptyMini text="Nothing outstanding." tone="leaf" />
           ) : (
-            <div className="hd-table shadow-hand-soft">
-              <table className="w-full text-left text-sm font-body">
-                <thead className="bg-pencil text-white font-display">
+            <div className="overflow-x-auto border border-border rounded-2xl shadow-sm bg-card">
+              <table className="w-full text-left text-sm font-body whitespace-nowrap">
+                <thead className="bg-muted text-muted-foreground font-semibold uppercase tracking-wider text-[10px] border-b border-border">
                   <tr>
-                    <th className="px-3 py-2">#</th>
-                    <th className="px-3 py-2">Customer</th>
-                    <th className="px-3 py-2">Due</th>
-                    <th className="px-3 py-2 text-right">Balance</th>
+                    <th className="px-5 py-3">#</th>
+                    <th className="px-5 py-3">Customer</th>
+                    <th className="px-5 py-3">Due</th>
+                    <th className="px-5 py-3 text-right">Balance</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-border">
                   {pending.map(({ job: j, balance }) => (
-                    <tr key={String(j.id)} className="border-t border-dashed border-pencil/30 hover:bg-postit/40">
-                      <td className="px-3 py-2 font-mono font-bold">
-                        <Link href={`/jobs/${j.id}`} className="hover:text-ink">
+                    <tr key={String(j.id)} className="hover:bg-muted/40 transition-colors">
+                      <td className="px-5 py-3.5 font-mono font-bold text-foreground">
+                        <Link href={`/jobs/${j.id}`} className="hover:text-blue-600 transition-colors">
                           #{j.jobNo}
                         </Link>
                       </td>
-                      <td className="px-3 py-2 truncate max-w-[220px]" title={j.companyName}>
+                      <td className="px-5 py-3.5 font-medium truncate max-w-[220px] text-foreground" title={j.companyName}>
                         {j.companyName}
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="px-5 py-3.5">
                         <span
                           className={cn(
-                            'text-xs font-bold',
-                            isOverdueDate(j.deliveryDate) ? 'text-accent' : 'text-pencil/70',
+                            'text-xs font-bold px-2 py-1 rounded border',
+                            isOverdueDate(j.deliveryDate) ? 'bg-red-50 text-red-600 border-red-200' : 'bg-muted text-muted-foreground border-border',
                           )}
                         >
                           {j.deliveryDate ? fmtShortDate(j.deliveryDate) : '—'}
                         </span>
                       </td>
-                      <td className="px-3 py-2 text-right font-mono font-bold text-accent">{fmt(balance)}</td>
+                      <td className="px-5 py-3.5 text-right font-mono font-bold text-red-500">{fmt(balance)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -330,54 +318,36 @@ function Tile({
   label,
   value,
   tone,
-  tilt,
-  big,
-  tack,
 }: {
   label: string;
   value: string;
-  tone: 'paper' | 'ink' | 'leaf' | 'accent' | 'postit' | 'amber' | 'muted';
-  tilt: 'l' | 'r' | 'l2' | 'r2';
-  big?: boolean;
-  tack?: boolean;
+  tone: 'muted' | 'ink' | 'leaf' | 'accent' | 'amber';
 }) {
-  const tones: Record<typeof tone, string> = {
-    paper: 'bg-white text-pencil',
-    ink: 'bg-ink-lt text-ink',
-    leaf: 'bg-leaf-lt text-leaf',
-    accent: 'bg-accent-lt text-accent',
-    postit: 'bg-postit text-pencil',
-    amber: 'bg-amber-lt text-amber-sketch',
-    muted: 'bg-muted text-pencil/70',
-  };
-  const tilts: Record<typeof tilt, string> = {
-    l: 'tilt-l',
-    r: 'tilt-r',
-    l2: 'tilt-l2',
-    r2: 'tilt-r2',
-  };
+  const cls = {
+    muted: 'bg-card text-foreground border-border',
+    ink: 'bg-blue-50 text-blue-700 border-blue-100',
+    leaf: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+    accent: 'bg-red-50 text-red-700 border-red-100',
+    amber: 'bg-amber-50 text-amber-700 border-amber-100',
+  }[tone];
   return (
     <div
       className={cn(
-        'relative border-2 border-pencil shadow-hand wobbly-md p-4',
-        tones[tone],
-        tilts[tilt],
-        'transition-transform hover:-translate-y-0.5',
+        'relative border rounded-2xl p-6 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-md cursor-default',
+        cls,
       )}
     >
-      {tack && <Thumbtack tone="accent" />}
-      <div className="text-xs font-display uppercase tracking-wide opacity-60">{label}</div>
-      <div className={cn('font-mono font-bold mt-1', big ? 'text-2xl' : 'text-3xl')}>{value}</div>
+      <div className="text-[11px] font-semibold uppercase tracking-widest opacity-80">{label}</div>
+      <div className="font-mono font-bold mt-2 text-4xl tracking-tight">{value}</div>
     </div>
   );
 }
 
 function EmptyMini({ text, tone }: { text: string; tone?: 'leaf' }) {
-  const cls = tone === 'leaf' ? 'bg-leaf-lt border-leaf text-leaf' : 'bg-muted border-pencil/40 text-pencil/60';
-  const tilt = seededTilt(text);
+  const cls = tone === 'leaf' ? 'bg-emerald-50/50 border-emerald-200 text-emerald-600' : 'bg-muted/30 border-dashed border-border text-muted-foreground';
   return (
-    <div className={cn('border-2 border-dashed wobbly-md px-4 py-6 text-center', cls, tilt)}>
-      <span className="font-body italic">{text}</span>
+    <div className={cn('border rounded-2xl px-6 py-12 text-center text-lg font-medium', cls)}>
+      <span>{text}</span>
     </div>
   );
 }
