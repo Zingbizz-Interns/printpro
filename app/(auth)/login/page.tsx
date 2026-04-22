@@ -1,25 +1,43 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardBody } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input, Label } from '@/components/ui/input';
 import { supabase } from '@/lib/supabase/client';
-import { useAuthStore } from '@/lib/auth/store';
+import { resolveRoleDestination } from '@/lib/auth/resolve-role';
 
 export default function Login() {
   const router = useRouter();
-  const alreadyIn = useAuthStore((s) => s.currentUser);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [checking, setChecking] = useState(true);
 
+  // If the user is already signed in, send them to their role's landing.
   useEffect(() => {
-    if (alreadyIn) router.replace('/kanban');
-  }, [alreadyIn, router]);
+    let cancelled = false;
+    (async () => {
+      const { data: { session } } = await supabase().auth.getSession();
+      if (cancelled) return;
+      if (session?.user?.id) {
+        const dest = await resolveRoleDestination(session.user.id);
+        if (cancelled) return;
+        if (dest) {
+          router.replace(dest);
+          return;
+        }
+      }
+      setChecking(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
   async function submit() {
     if (!email.trim() || !password) {
@@ -29,19 +47,35 @@ export default function Login() {
     setBusy(true);
     setError(null);
     try {
-      const { error: signInErr } = await supabase().auth.signInWithPassword({
+      const { data, error: signInErr } = await supabase().auth.signInWithPassword({
         email: email.trim(),
         password,
       });
-      if (signInErr) {
-        setError(signInErr.message || 'Sign in failed.');
+      if (signInErr || !data.user) {
+        setError(signInErr?.message || 'Sign in failed.');
         setPassword('');
         return;
       }
-      // SupabaseSessionSync will hydrate useAuthStore; effect above redirects.
+      const dest = await resolveRoleDestination(data.user.id);
+      if (!dest) {
+        await supabase().auth.signOut();
+        setError(
+          "This account isn't linked to a staff role or customer profile. Contact support.",
+        );
+        return;
+      }
+      router.replace(dest);
     } finally {
       setBusy(false);
     }
+  }
+
+  if (checking) {
+    return (
+      <main className="min-h-screen grid place-items-center">
+        <span className="font-display text-2xl animate-pulse">loading…</span>
+      </main>
+    );
   }
 
   return (
@@ -56,7 +90,7 @@ export default function Login() {
         <Card className="p-8 shadow-2xl border-border rounded-[2rem] backdrop-blur-xl bg-background">
           <CardHeader className="text-center pb-6">
             <CardTitle className="text-3xl font-body font-bold tracking-tight">Welcome Back</CardTitle>
-            <p className="text-muted-foreground mt-2 font-medium">Sign in with your work email.</p>
+            <p className="text-muted-foreground mt-2 font-medium">Sign in to your account.</p>
           </CardHeader>
 
           <CardBody>
@@ -69,10 +103,7 @@ export default function Login() {
                   autoComplete="username"
                   autoFocus
                   value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setError(null);
-                  }}
+                  onChange={(e) => { setEmail(e.target.value); setError(null); }}
                   placeholder="you@company.com"
                   className="mt-1.5 shadow-inner"
                 />
@@ -84,10 +115,7 @@ export default function Login() {
                   type="password"
                   autoComplete="current-password"
                   value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setError(null);
-                  }}
+                  onChange={(e) => { setPassword(e.target.value); setError(null); }}
                   onKeyDown={(e) => e.key === 'Enter' && submit()}
                   placeholder="Your password"
                   className="mt-1.5 shadow-inner"
@@ -108,7 +136,7 @@ export default function Login() {
                   disabled={busy}
                   className="w-full shadow-lg"
                 >
-                  {busy ? 'Verifying…' : 'Sign In'}
+                  {busy ? 'Signing in…' : 'Sign In'}
                 </Button>
               </div>
             </div>
@@ -116,14 +144,17 @@ export default function Login() {
         </Card>
 
         <p className="mt-8 text-center text-sm text-muted-foreground font-medium">
-          Accounts are managed in the Supabase dashboard.
+          New customer?{' '}
+          <Link href="/portal/signup" className="text-accent font-semibold hover:underline">
+            Create an account
+          </Link>
         </p>
-      </div>
 
-      {/* Decorative background elements */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-blue-500/5 blur-[120px]" />
-        <div className="absolute -bottom-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-500/5 blur-[120px]" />
+        {/* Decorative background elements */}
+        <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-blue-500/5 blur-[120px]" />
+          <div className="absolute -bottom-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-500/5 blur-[120px]" />
+        </div>
       </div>
     </main>
   );

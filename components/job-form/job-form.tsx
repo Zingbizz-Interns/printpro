@@ -7,6 +7,7 @@ import { useAuthStore } from '@/lib/auth/store';
 import { insertJob, updateJob, deleteJob, nextJobNo } from '@/lib/db/jobs';
 import { syncCustomerFromJob } from '@/lib/db/customers';
 import { listPaymentsForJob } from '@/lib/db/payments';
+import { triggerPortalEvent } from '@/lib/email/client';
 import { useDraft } from './use-draft';
 import { CustomerSection } from './customer-section';
 import { DeliverySection } from './delivery-section';
@@ -20,7 +21,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { Job } from '@/types/db';
 import { ChevronLeft } from 'lucide-react';
-import { cloneJob } from '@/lib/domain/draft';
+import { cloneJob, itemStageForJobStatus } from '@/lib/domain/draft';
+import type { JobStatus } from '@/types/db';
 import { useEffect, useState } from 'react';
 
 interface Props {
@@ -70,6 +72,7 @@ export function JobForm({ initial }: Props) {
         createdById: draft.createdById ?? user?.id ?? null,
       };
 
+      const prev = initial;
       if (isNew) {
         const jobNo = await nextJobNo();
         toPersist.jobNo = jobNo;
@@ -84,6 +87,7 @@ export function JobForm({ initial }: Props) {
         } catch {
           /* noop */
         }
+        dispatchPostSaveEvents(prev, saved);
         return saved;
       }
 
@@ -93,6 +97,7 @@ export function JobForm({ initial }: Props) {
       } catch {
         /* noop */
       }
+      dispatchPostSaveEvents(prev, saved);
       return saved;
     },
     onSuccess: (saved) => {
@@ -140,6 +145,12 @@ export function JobForm({ initial }: Props) {
       );
       update({ items });
     }
+  }
+
+  function handleChangeJobStatus(next: JobStatus) {
+    const stage = itemStageForJobStatus(next);
+    const items = draft.items.map((it) => ({ ...it, ...stage }));
+    update({ jobStatus: next, items });
   }
 
   function confirmDelete() {
@@ -211,6 +222,7 @@ export function JobForm({ initial }: Props) {
             derivedJobStatus={api.derivedJobStatus}
             derivedPaymentStatus={api.derivedPaymentStatus}
             onUpdate={update}
+            onChangeJobStatus={handleChangeJobStatus}
           />
         </div>
       </div>
@@ -246,4 +258,31 @@ export function JobForm({ initial }: Props) {
       )}
     </div>
   );
+}
+
+function dispatchPostSaveEvents(prev: Job, saved: Job): void {
+  // 1. proof-ready — fire for every item whose image_url just went
+  //    from empty/different to a new non-empty value. One email per
+  //    item (debounce key is per jobItemId).
+  const prevById = new Map<number, Job['items'][number]>();
+  for (const it of prev.items) {
+    if (typeof it.id === 'number') prevById.set(it.id, it);
+  }
+  for (const it of saved.items) {
+    if (typeof it.id !== 'number') continue;
+    if (!it.imageUrl) continue;
+    const wasUrl = prevById.get(it.id)?.imageUrl || '';
+    if (wasUrl === it.imageUrl) continue;
+    triggerPortalEvent({ type: 'proof-ready', jobItemId: it.id });
+  }
+
+  // 2. ready-for-pickup / delivered — only on status transitions.
+  if (typeof saved.id === 'number') {
+    if (saved.jobStatus === 'Ready for Delivery' && prev.jobStatus !== 'Ready for Delivery') {
+      triggerPortalEvent({ type: 'ready-for-pickup', jobId: saved.id });
+    }
+    if (saved.jobStatus === 'Delivered' && prev.jobStatus !== 'Delivered') {
+      triggerPortalEvent({ type: 'delivered', jobId: saved.id });
+    }
+  }
 }

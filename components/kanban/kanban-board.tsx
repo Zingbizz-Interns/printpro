@@ -6,6 +6,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/auth/store';
 import { listJobs, deleteJob } from '@/lib/db/jobs';
+import { listAllReviews } from '@/lib/db/proof-reviews';
+import { summarizeJobProofs } from '@/lib/domain/proof-summary';
 import {
   INITIAL_FILTERS,
   computeStats,
@@ -37,8 +39,18 @@ export function KanbanBoard() {
   const jobsQ = useQuery({ queryKey: ['jobs'], queryFn: listJobs });
   const jobs = jobsQ.data ?? [];
 
+  const reviewsQ = useQuery({ queryKey: ['proof-reviews'], queryFn: listAllReviews });
+  const reviews = reviewsQ.data ?? [];
+
   const stats = useMemo(() => computeStats(jobs), [jobs]);
   const visible = useMemo(() => sortJobs(filterJobs(jobs, filters), filters.sort), [jobs, filters]);
+  const proofSummaries = useMemo(() => {
+    const m = new Map<number, ReturnType<typeof summarizeJobProofs>>();
+    for (const j of jobs) {
+      if (typeof j.id === 'number') m.set(j.id, summarizeJobProofs(j, reviews));
+    }
+    return m;
+  }, [jobs, reviews]);
 
   const del = useMutation({
     mutationFn: (id: number) => deleteJob(id),
@@ -143,6 +155,7 @@ export function KanbanBoard() {
                 dense={density >= 8}
                 onClone={confirmClone}
                 onDelete={confirmDelete}
+                proofSummary={typeof j.id === 'number' ? proofSummaries.get(j.id) : undefined}
               />
             ))}
           </AnimatePresence>

@@ -5,6 +5,8 @@
  */
 
 import type {
+  CustomerProfileRow,
+  CustomerSessionUser,
   Job,
   JobItem,
   JobItemRow,
@@ -36,6 +38,7 @@ export function dbToJob(row: JobOrderRow & { job_items?: JobItemRow[] }): Job {
     discountPct: toNum(row.discount_pct),
     createdBy: row.created_by || '',
     createdById: row.created_by_id || null,
+    customerUserId: row.customer_user_id || null,
     items: (row.job_items || [])
       .slice()
       .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
@@ -62,6 +65,7 @@ export function dbToItem(row: JobItemRow): JobItem {
     remarks: row.remarks || '',
     imageUrl: row.image_url || '',
     sortOrder: row.sort_order || 0,
+    proofUploadedAt: row.proof_uploaded_at ?? null,
   };
 }
 
@@ -93,6 +97,23 @@ export function jobToDb(
     discount_pct: toNum(j.discountPct),
     created_by: j.createdBy || fallbackCreatedBy || '',
     created_by_id: j.createdById ?? fallbackCreatedById ?? null,
+    customer_user_id: j.customerUserId ?? null,
+  };
+}
+
+export function dbToCustomerSessionUser(
+  row: CustomerProfileRow,
+): CustomerSessionUser {
+  return {
+    id: row.id,
+    email: row.email,
+    name: row.name || '',
+    companyName: row.company_name || '',
+    contactNumber: row.contact_number || '',
+    gstNo: row.gst_no || '',
+    billingAddress: row.billing_address || '',
+    gstCertificateUrl: row.gst_certificate_url || null,
+    emailPrefs: row.email_prefs || {},
   };
 }
 

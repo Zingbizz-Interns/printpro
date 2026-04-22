@@ -20,6 +20,7 @@ import {
   type Period,
 } from '@/lib/dashboard/period';
 import { cn } from '@/lib/utils';
+import { FeedbackWidget } from '@/components/dashboard/feedback-widget';
 import type { Job, PaymentStatus } from '@/types/db';
 
 const PAY_FILTERS: { v: PaymentStatus | ''; l: string }[] = [
@@ -257,6 +258,8 @@ export default function DashboardPage() {
           )}
         </section>
       </div>
+
+      <FeedbackWidget />
     </main>
   );
 }

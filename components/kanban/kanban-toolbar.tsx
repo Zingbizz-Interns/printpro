@@ -33,6 +33,11 @@ export function KanbanToolbar({ tab, onTab, stats, density, onDensity }: Props) 
 
       {/* Stats chips */}
       <div className="flex flex-wrap gap-2">
+        {stats.pendingReview > 0 && (
+          <Badge tone="ink" className="text-[10px] bg-sky-50 text-sky-700 border-sky-200">
+            ⏳ Pending <span className="ml-1">{stats.pendingReview}</span>
+          </Badge>
+        )}
         <Badge tone="accent" dashed={stats.overdue === 0} className="text-[10px]">
           ⚠ Overdue <span className="ml-1">{stats.overdue}</span>
         </Badge>

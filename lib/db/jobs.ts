@@ -67,34 +67,61 @@ export async function insertJob(
 }
 
 /**
- * Update an existing order: UPDATE the order row, then DELETE all
- * its items and re-INSERT. Simple full replacement (copy.html:4693-4701).
+ * Update an existing order. UPDATE the order row, then reconcile
+ * job_items **by id** — update existing, insert new, delete only those
+ * that vanished from the payload. Preserves `job_items.id` across staff
+ * edits so downstream rows keyed on it (e.g. `proof_reviews`) aren't
+ * cascade-wiped on every save.
  */
 export async function updateJob(j: Job): Promise<Job> {
   if (typeof j.id !== 'number') throw new Error('updateJob requires a numeric id');
   const sb = supabase();
+  const jobId = j.id;
 
-  const { error: orderErr } = await sb
-    .from('job_orders')
-    .update(jobToDb(j))
-    .eq('id', j.id);
+  const { error: orderErr } = await sb.from('job_orders').update(jobToDb(j)).eq('id', jobId);
   if (orderErr) throw orderErr;
 
-  const { error: delErr } = await sb.from('job_items').delete().eq('job_order_id', j.id);
-  if (delErr) throw delErr;
-
-  let insertedItems: JobItemRow[] = [];
-  if (j.items.length) {
-    const rows = j.items.map((it, i) => itemToDb(it, j.id as number, i));
-    const { data: newItems, error: itemErr } = await sb
-      .from('job_items')
-      .insert(rows)
-      .select();
-    if (itemErr) throw itemErr;
-    insertedItems = (newItems ?? []) as JobItemRow[];
+  const keptIds: number[] = [];
+  for (const [i, it] of j.items.entries()) {
+    const row = itemToDb(it, jobId, i);
+    if (typeof it.id === 'number') {
+      const { error } = await sb.from('job_items').update(row).eq('id', it.id);
+      if (error) throw error;
+      keptIds.push(it.id);
+    } else {
+      const { data, error } = await sb
+        .from('job_items')
+        .insert(row)
+        .select('id')
+        .single();
+      if (error) throw error;
+      keptIds.push((data as { id: number }).id);
+    }
   }
 
-  return { ...j, items: insertedItems.map((r, i) => ({ ...j.items[i], id: r.id })), _dirty: false } as Job;
+  let delQ = sb.from('job_items').delete().eq('job_order_id', jobId);
+  if (keptIds.length) delQ = delQ.not('id', 'in', `(${keptIds.join(',')})`);
+  const { error: delErr } = await delQ;
+  if (delErr) throw delErr;
+
+  const { data: items, error: itemsErr } = await sb
+    .from('job_items')
+    .select('*')
+    .eq('job_order_id', jobId)
+    .order('sort_order');
+  if (itemsErr) throw itemsErr;
+
+  const { data: order, error: orderFetchErr } = await sb
+    .from('job_orders')
+    .select('*')
+    .eq('id', jobId)
+    .single();
+  if (orderFetchErr || !order) throw orderFetchErr ?? new Error('refetch returned no row');
+
+  return dbToJob({
+    ...(order as JobOrderRow),
+    job_items: (items ?? []) as JobItemRow[],
+  });
 }
 
 /** Delete job + cascade items via FK (copy.html:3258, 4659). */

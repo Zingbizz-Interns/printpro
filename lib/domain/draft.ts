@@ -1,4 +1,4 @@
-import type { Job, JobItem, DesignStatus, PrintStatus } from '@/types/db';
+import type { Job, JobItem, DesignStatus, PrintStatus, JobStatus } from '@/types/db';
 
 let _tmpId = 0;
 function tmpId(): string {
@@ -24,6 +24,7 @@ export function makeBlankItem(defaults?: Partial<JobItem>): JobItem {
     remarks: '',
     imageUrl: '',
     sortOrder: 0,
+    proofUploadedAt: null,
     ...defaults,
   };
 }
@@ -55,6 +56,7 @@ export function makeDraftJob(createdBy?: string, createdById?: string | null): J
     discountPct: 0,
     createdBy: createdBy || '',
     createdById: createdById ?? null,
+    customerUserId: null,
     items: [],
     _dirty: false,
     _isNew: true,
@@ -91,6 +93,37 @@ export function cloneJob(source: Job, createdBy?: string, createdById?: string |
     _isDraft: true,
     _partialPayments: undefined,
   };
+}
+
+/**
+ * Map a target job status to the (designStatus, printStatus) pair that every
+ * item should take so `deriveJobStatus` produces that same status.
+ *
+ * Meta statuses the derivation can't produce from items (`Pending Review`,
+ * `On Hold`) reset items to neutral so the derivation falls through to the
+ * job-level `jobStatus` fallback.
+ */
+export function itemStageForJobStatus(
+  status: JobStatus,
+): { designStatus: DesignStatus; printStatus: PrintStatus } {
+  switch (status) {
+    case 'Design - Not yet Started':
+    case 'Pending Review':
+    case 'On Hold':
+      return { designStatus: 'Design - Not yet Started', printStatus: 'Not Printed' };
+    case 'Design - In Progress':
+      return { designStatus: 'Design - In Progress', printStatus: 'Not Printed' };
+    case 'Design - Approved':
+      return { designStatus: 'Design - Approved', printStatus: 'Not Printed' };
+    case 'In Printing':
+      return { designStatus: 'Design - Approved', printStatus: 'In Printing' };
+    case 'In Finishing':
+      return { designStatus: 'In Finishing', printStatus: 'In Printing' };
+    case 'Ready for Delivery':
+      return { designStatus: 'In Finishing', printStatus: 'Ready' };
+    case 'Delivered':
+      return { designStatus: 'In Finishing', printStatus: 'Delivered' };
+  }
 }
 
 /** Basic GST format: 2 digits + 5 letters + 4 digits + letter + digit + letter + digit/letter. */

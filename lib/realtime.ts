@@ -57,6 +57,15 @@ export function useRealtimeSync(onStatus?: (s: string) => void): void {
           }
         },
       )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'proof_reviews' },
+        () => {
+          qc.invalidateQueries({ queryKey: ['proof-reviews'] });
+          qc.invalidateQueries({ queryKey: ['staff-job-reviews'] });
+          qc.invalidateQueries({ queryKey: ['jobs'] });
+        },
+      )
       .subscribe((status) => {
         onStatus?.(status);
       });

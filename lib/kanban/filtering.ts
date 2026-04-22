@@ -86,6 +86,7 @@ export function sortJobs(jobs: Job[], mode: SortMode): Job[] {
 
 function rank(j: Job): number {
   if (j.jobStatus === 'Delivered') return 9_000_000 + (daysUntilDue(j.deliveryDate) ?? 0);
+  if (j.jobStatus === 'Pending Review') return -2_000_000; // needs staff action first
   if (j.jobStatus === 'On Hold') return -1_000_000;
 
   const d = daysUntilDue(j.deliveryDate);
@@ -103,6 +104,7 @@ export interface BoardStats {
   unpaid: number;
   gst: number;
   outstanding: number;
+  pendingReview: number;
 }
 
 export function computeStats(all: Job[]): BoardStats {
@@ -113,10 +115,12 @@ export function computeStats(all: Job[]): BoardStats {
   let gst = 0;
   let active = 0;
   let completed = 0;
+  let pendingReview = 0;
 
   for (const j of all) {
     if (j.jobStatus === 'Delivered') completed++;
     else active++;
+    if (j.jobStatus === 'Pending Review') pendingReview++;
 
     if (isOverdueDate(j.deliveryDate) && j.jobStatus !== 'Delivered') overdue++;
     if (isDueToday(j.deliveryDate) && j.jobStatus !== 'Delivered') dueToday++;
@@ -137,6 +141,7 @@ export function computeStats(all: Job[]): BoardStats {
     unpaid,
     gst,
     outstanding,
+    pendingReview,
   };
 }
 

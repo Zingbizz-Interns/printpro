@@ -51,6 +51,21 @@ export interface JobOrderRow {
   discount_pct: number | string;
   created_by: string;               // display-name snapshot (frozen at save)
   created_by_id: string | null;     // uuid, FK → profiles.id
+  customer_user_id: string | null;  // uuid, FK → customer_profiles.id (portal link)
+}
+
+export interface CustomerProfileRow {
+  id: string;                       // uuid, FK → auth.users.id
+  email: string;
+  name: string;
+  company_name: string;
+  contact_number: string;
+  gst_no: string;
+  billing_address: string;
+  gst_certificate_url: string | null;
+  email_prefs: Record<string, boolean>;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface JobItemRow {
@@ -71,6 +86,18 @@ export interface JobItemRow {
   remarks: string;
   image_url: string;
   sort_order: number;
+  proof_uploaded_at?: string | null;
+}
+
+export type ProofDecision = 'approved' | 'changes_requested';
+
+export interface ProofReviewRow {
+  id: number;
+  job_item_id: number;
+  customer_user_id: string;
+  decision: ProofDecision;
+  comment: string;
+  created_at: string;
 }
 
 export interface PartialPaymentRow {
@@ -96,6 +123,7 @@ export interface CustomerRow {
 // ── Status enums (strings from the reference app) ───────────────
 
 export type JobStatus =
+  | 'Pending Review'
   | 'Design - Not yet Started'
   | 'Design - In Progress'
   | 'Design - Approved'
@@ -151,6 +179,7 @@ export interface Job {
   discountPct: number;
   createdBy: string;                // display-name snapshot
   createdById: string | null;       // uuid, populated from session when saving
+  customerUserId: string | null;    // uuid, FK → customer_profiles.id
   items: JobItem[];
   _dirty?: boolean;
   _isNew?: boolean;
@@ -175,6 +204,90 @@ export interface JobItem {
   remarks: string;
   imageUrl: string;
   sortOrder: number;
+  proofUploadedAt: string | null;
+}
+
+export interface ProofReview {
+  id: number;
+  jobItemId: number;
+  customerUserId: string;
+  decision: ProofDecision;
+  comment: string;
+  createdAt: string;
+}
+
+export type ArtworkSource = 'quote' | 'upload' | 'reorder';
+
+export interface CustomerArtworkRow {
+  id: number;
+  customer_user_id: string;
+  file_url: string;
+  file_name: string;
+  mime_type: string;
+  size_bytes: number;
+  source: ArtworkSource;
+  source_job_id: number | null;
+  uploaded_at: string;
+}
+
+export interface CustomerArtwork {
+  id: number;
+  customerUserId: string;
+  fileUrl: string;
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  source: ArtworkSource;
+  sourceJobId: number | null;
+  uploadedAt: string;
+}
+
+/**
+ * Line item shape used for the create_pending_job RPC — only the
+ * fields a customer can influence. No rate, no status, no sort_order.
+ */
+export interface PendingJobItemInput {
+  category: string;
+  description: string;
+  size?: string;
+  material?: string;
+  specs?: string;
+  finishing?: string;
+  quantity: number;
+  unit?: string;
+  image_url?: string;
+}
+
+export interface JobFeedbackRow {
+  id: number;
+  job_order_id: number;
+  customer_user_id: string;
+  rating: number;
+  comment: string;
+  would_recommend: boolean | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JobFeedback {
+  id: number;
+  jobOrderId: number;
+  customerUserId: string;
+  rating: number;
+  comment: string;
+  wouldRecommend: boolean | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Shape used by the staff dashboard — a feedback row joined with the
+ * minimal job + customer context needed to render the list.
+ */
+export interface JobFeedbackWithContext extends JobFeedback {
+  jobNo: number;
+  companyName: string;
+  customerName: string;
 }
 
 export interface SessionUser {
@@ -183,4 +296,20 @@ export interface SessionUser {
   username: string;
   role: 'owner' | 'staff';
   color: string;
+}
+
+/**
+ * App-side shape of a customer-portal user. Mirrors CustomerProfileRow
+ * but camelCased.
+ */
+export interface CustomerSessionUser {
+  id: string;                       // uuid from auth.users
+  email: string;
+  name: string;
+  companyName: string;
+  contactNumber: string;
+  gstNo: string;
+  billingAddress: string;
+  gstCertificateUrl: string | null;
+  emailPrefs: Record<string, boolean>;
 }

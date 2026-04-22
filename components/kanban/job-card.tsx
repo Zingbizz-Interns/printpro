@@ -8,7 +8,8 @@ import { daysUntilDue, deliveryLabel, isOverdueDate } from '@/lib/kanban/date-ut
 import { jobGrandTotal, fmt } from '@/lib/domain/totals';
 import { cn } from '@/lib/utils';
 import type { Job } from '@/types/db';
-import { Package, Copy, Trash2, Pencil } from 'lucide-react';
+import type { ProofSummary } from '@/lib/domain/proof-summary';
+import { Package, Copy, Trash2, Pencil, Check, MessageSquare, RotateCw } from 'lucide-react';
 
 interface Props {
   job: Job;
@@ -16,9 +17,10 @@ interface Props {
   onDelete?: (id: number) => void;
   isOwner?: boolean;
   dense?: boolean;
+  proofSummary?: ProofSummary;
 }
 
-export function JobCard({ job, onClone, onDelete, isOwner, dense }: Props) {
+export function JobCard({ job, onClone, onDelete, isOwner, dense, proofSummary }: Props) {
   const theme = statusTheme(job.jobStatus);
   const gt = jobGrandTotal(job);
   const adv = Number(job.advancePaid) || 0;
@@ -91,6 +93,7 @@ export function JobCard({ job, onClone, onDelete, isOwner, dense }: Props) {
               −{Number(job.discountPct)}%
             </span>
           )}
+          <ProofBadge summary={proofSummary} />
         </div>
 
         <div className="mt-3 mx-4 border-t border-border/60" />
@@ -179,6 +182,30 @@ function DeliveryPill({
     <span className={cn('text-xs border px-2.5 py-0.5 rounded-full flex items-center gap-1.5', cls)}>
       <span>{mark}</span>
       {label}
+    </span>
+  );
+}
+
+function ProofBadge({ summary }: { summary?: ProofSummary }) {
+  if (!summary || summary.total === 0) return null;
+  if (summary.changes > 0) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+        <RotateCw size={10} /> Changes {summary.changes > 1 ? `(${summary.changes})` : ''}
+      </span>
+    );
+  }
+  if (summary.pending > 0) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700">
+        <MessageSquare size={10} /> Awaiting{summary.pending > 1 ? ` (${summary.pending})` : ''}
+      </span>
+    );
+  }
+  // all items with image_url have been approved
+  return (
+    <span className="inline-flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
+      <Check size={10} /> Approved
     </span>
   );
 }

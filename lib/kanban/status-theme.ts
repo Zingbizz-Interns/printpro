@@ -16,6 +16,14 @@ export interface StatusTheme {
 }
 
 export const STATUS_THEME: Record<JobStatus, StatusTheme> = {
+  'Pending Review': {
+    label: 'Pending Review',
+    accent: '#0ea5e9',
+    tint: '#e0f2fe',
+    ink: '#0369a1',
+    mark: '⏳',
+    priority: -1,
+  },
   'On Hold': {
     label: 'On Hold',
     accent: '#ff4d4d',
@@ -83,6 +91,7 @@ export const STATUS_THEME: Record<JobStatus, StatusTheme> = {
 };
 
 export const ALL_STATUSES: JobStatus[] = [
+  'Pending Review',
   'Design - Not yet Started',
   'Design - In Progress',
   'Design - Approved',

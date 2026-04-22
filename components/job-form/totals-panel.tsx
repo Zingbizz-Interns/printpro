@@ -3,7 +3,7 @@
 import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { STATUS_THEME } from '@/lib/kanban/status-theme';
+import { STATUS_THEME, ALL_STATUSES } from '@/lib/kanban/status-theme';
 import { fmt } from '@/lib/domain/totals';
 import type { Job, JobStatus, PaymentStatus } from '@/types/db';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,7 @@ interface Props {
   derivedJobStatus: JobStatus;
   derivedPaymentStatus: PaymentStatus;
   onUpdate: (patch: Partial<Job>) => void;
+  onChangeJobStatus: (status: JobStatus) => void;
 }
 
 export function TotalsPanel({
@@ -28,7 +29,9 @@ export function TotalsPanel({
   derivedJobStatus,
   derivedPaymentStatus,
   onUpdate,
+  onChangeJobStatus,
 }: Props) {
+  const theme = STATUS_THEME[derivedJobStatus];
   const discAmt = subtotal * ((draft.discountPct || 0) / 100);
   const afterDisc = subtotal - discAmt;
   const gstAmt = draft.gstEnabled ? afterDisc * 0.18 : 0;
@@ -105,20 +108,32 @@ export function TotalsPanel({
         <div className="pt-4 border-t border-border space-y-3">
           <div className="flex items-center justify-between gap-2 bg-muted/30 px-3 py-2 rounded-xl">
             <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Job Status</span>
-            <Badge
-              className="text-[10px] sm:text-xs font-semibold rounded-md flex items-center justify-center border shadow-sm px-2.5 py-1 min-h-[28px]"
-              style={{
-                background: STATUS_THEME[derivedJobStatus].tint,
-                color: STATUS_THEME[derivedJobStatus].ink,
-                borderColor: STATUS_THEME[derivedJobStatus].ink,
-              }}
-            >
-              <div className="flex items-center gap-1.5 leading-none">
-                <span className="text-[10px] mt-0.5">{STATUS_THEME[derivedJobStatus].mark}</span>
-                <span className="pt-px">{STATUS_THEME[derivedJobStatus].label}</span>
-                <span className="ml-1 opacity-60 font-mono tracking-widest text-[8px] uppercase border-l border-current pl-1 pt-px">Auto</span>
-              </div>
-            </Badge>
+            <div className="relative">
+              <select
+                value={derivedJobStatus}
+                onChange={(e) => onChangeJobStatus(e.target.value as JobStatus)}
+                aria-label="Job status"
+                className="appearance-none text-[10px] sm:text-xs font-semibold rounded-md border shadow-sm pl-2.5 pr-7 py-1 min-h-[28px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring"
+                style={{
+                  background: theme.tint,
+                  color: theme.ink,
+                  borderColor: theme.ink,
+                }}
+              >
+                {ALL_STATUSES.map((s) => (
+                  <option key={s} value={s} className="bg-card text-foreground">
+                    {STATUS_THEME[s].mark} {STATUS_THEME[s].label}
+                  </option>
+                ))}
+              </select>
+              <span
+                aria-hidden
+                className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-mono"
+                style={{ color: theme.ink }}
+              >
+                ▾
+              </span>
+            </div>
           </div>
           <div className="flex items-center justify-between gap-2 bg-muted/30 px-3 py-2 rounded-xl">
             <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Payment</span>

@@ -4,6 +4,7 @@ import { use } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { JobForm } from '@/components/job-form/job-form';
+import { StaffProofHistory } from '@/components/jobs/staff-proof-history';
 import { listJobs } from '@/lib/db/jobs';
 import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -48,5 +49,12 @@ export default function JobDetail({ params }: Props) {
     );
   }
 
-  return <JobForm key={String(job.id)} initial={job} />;
+  return (
+    <>
+      <JobForm key={String(job.id)} initial={job} />
+      <div className="px-6 pb-12 max-w-5xl mx-auto">
+        <StaffProofHistory job={job} />
+      </div>
+    </>
+  );
 }
