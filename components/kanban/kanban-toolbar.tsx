@@ -1,7 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { fmt } from '@/lib/domain/totals';
 import type { BoardStats, ViewTab } from '@/lib/kanban/filtering';
 import { LayoutGrid } from 'lucide-react';
@@ -66,6 +68,11 @@ export function KanbanToolbar({ tab, onTab, stats, density, onDensity }: Props) 
           </button>
         ))}
       </div>
+
+      {/* New Job */}
+      <Link href="/jobs/new">
+        <Button variant="primary" size="sm">+ New Job</Button>
+      </Link>
     </div>
   );
 }

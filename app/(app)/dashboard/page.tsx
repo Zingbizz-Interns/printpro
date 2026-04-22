@@ -8,6 +8,7 @@ import { useAuthStore } from '@/lib/auth/store';
 import { listJobs } from '@/lib/db/jobs';
 import { Card, CardBody } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { fmt, jobGrandTotal } from '@/lib/domain/totals';
 import { fmtShortDate, isOverdueDate, isDueToday } from '@/lib/kanban/date-utils';
 import { statusTheme } from '@/lib/kanban/status-theme';
@@ -80,6 +81,9 @@ export default function DashboardPage() {
             How's the shop doing?
           </h1>
         </div>
+        <Link href="/jobs/new">
+          <Button variant="primary">+ New Job</Button>
+        </Link>
       </div>
 
       {/* Filters */}
