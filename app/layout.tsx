@@ -25,7 +25,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Print Pro — Job Orders',
+  title: 'S Prints — Job Orders',
   description: 'Hand-drawn job order management for print shops.',
 };
 

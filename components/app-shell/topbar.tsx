@@ -45,7 +45,7 @@ export function Topbar() {
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-accent text-white shadow-accent">
             <Printer size={20} strokeWidth={2.5} />
           </div>
-          <span className="font-display text-2xl leading-none tracking-tight hidden lg:block text-foreground mt-1">Print Pro</span>
+          <span className="font-display text-2xl leading-none tracking-tight hidden lg:block text-foreground mt-1">S Prints</span>
         </Link>
 
         {/* Separator */}
@@ -84,7 +84,7 @@ export function Topbar() {
                 {isOwner ? 'Admin' : 'Staff'}
               </span>
             </div>
-            
+
             <div
               className="flex h-10 w-10 items-center justify-center rounded-full text-white font-medium text-sm border-2 border-background shadow-sm"
               style={{ background: user.color || 'var(--color-accent)' }}
@@ -93,7 +93,7 @@ export function Topbar() {
               {initialsOf(user.name)}
             </div>
           </div>
-          
+
           <div className="hidden sm:block w-px h-6 bg-border mx-1" />
 
           <Button

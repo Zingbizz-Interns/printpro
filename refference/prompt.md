@@ -1,8 +1,8 @@
-Complete feature list of **Print Pro** built from scratch :
+Complete feature list of **S Prints** built from scratch :
 
 ---
 
-## 🖨️ Print Pro — Job Order Management System
+## 🖨️ S Prints — Job Order Management System
 Live:
 ---
 

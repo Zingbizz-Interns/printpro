@@ -1,12 +1,12 @@
 <html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Print Pro BETA — Testing Environment</title>
+<title>S Prints BETA — Testing Environment</title>
 <!-- Fonts: Plus Jakarta Sans + JetBrains Mono (loaded via @import) -->
 <style>
 /*
  ╔══════════════════════════════════════════════════════════════╗
- ║  PRINT PRO  ·  SaaS UI System                                ║
+ ║  S Prints  ·  SaaS UI System                                ║
  ║  Inspired by Zoho · Freshdesk · Linear · Notion              ║
  ║  Fonts: Plus Jakarta Sans (body) · JetBrains Mono (code)     ║
  ║  Palette: Warm white surfaces · Indigo accent · Rich tokens   ║
@@ -1452,7 +1452,7 @@ input[type=number] { -moz-appearance:textfield; appearance:textfield; }
     <div class="login-brand">
       <div class="login-brand-icon">🖨</div>
       <div>
-        <div class="login-brand-name">Print Pro</div>
+        <div class="login-brand-name">S Prints</div>
         <div class="login-brand-tag">Job Order Management System</div>
       </div>
     </div>
@@ -1582,7 +1582,7 @@ input[type=number] { -moz-appearance:textfield; appearance:textfield; }
   <div class="topbar-brand" onclick="if(window.innerWidth&lt;=768){switchView('kanban');}" style="cursor:pointer;" title="Home — Board View">
     <div class="brand-icon">👑</div>
     <div>
-      <div class="brand-name">Print Pro <span style="font-size:9px;background:#f59e0b;color:#fff;padding:1px 6px;border-radius:8px;font-weight:800;vertical-align:middle;letter-spacing:.4px;">BETA</span></div>
+      <div class="brand-name">S Prints <span style="font-size:9px;background:#f59e0b;color:#fff;padding:1px 6px;border-radius:8px;font-weight:800;vertical-align:middle;letter-spacing:.4px;">BETA</span></div>
       <div class="brand-tag">Beta Testing Environment</div>
     </div>
     <!-- Mobile home indicator -->
@@ -1773,7 +1773,7 @@ input[type=number] { -moz-appearance:textfield; appearance:textfield; }
 <div id="productsView">
   <div class="prod-wrap">
     <div class="prod-page-title">📦 Product Categories</div>
-    <div class="prod-page-sub">Manage your print product types. Changes apply globally to all job orders.</div>
+    <div class="prod-page-sub">Manage your S Printsduct types. Changes apply globally to all job orders.</div>
     <div class="prod-card">
       <div class="prod-card-hdr">
         <div class="prod-card-title">
@@ -2139,11 +2139,11 @@ input[type=number] { -moz-appearance:textfield; appearance:textfield; }
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.js"></script>
 <script>
 // ════════════════════════════════════════════════════════════════
-//  Print Pro — Supabase Real-Time Multi-User Backend
+//  S Prints — Supabase Real-Time Multi-User Backend
 //  Replace SUPABASE_URL and SUPABASE_ANON_KEY with your values
 // ════════════════════════════════════════════════════════════════
 
-(function(){try{console.warn('%c⚠ PRINT PRO BETA — TESTING ENVIRONMENT','color:#f59e0b;font-size:16px;font-weight:bold;');}catch(e){}})();
+(function(){try{console.warn('%c⚠ S Prints BETA — TESTING ENVIRONMENT','color:#f59e0b;font-size:16px;font-weight:bold;');}catch(e){}})();
 const SUPABASE_URL  = 'https://yvedbgssoivvaezsvexy.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2ZWRiZ3Nzb2l2dmFlenN2ZXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5NDAwMzksImV4cCI6MjA5MTUxNjAzOX0.17rlnm8NBq2qr4SNHlNfEMG6OVv6ARe_JjPhnAOiBZc';
 
@@ -5259,7 +5259,7 @@ function downloadJobExcel(jobId) {
   const gstAmt = j.gstEnabled ? j.items.reduce((s,i)=>s+(parseFloat(i.quantity)||0)*(parseFloat(i.rate)||0),0)*0.18 : 0;
 
   const rows = [
-    ['PRINT PRO — JOB ORDER'],
+    ['S Prints — JOB ORDER'],
     [''],
     ['Job No', 'JOB #'+j.jobNo],
     ['Order Date', fmtDate(j.orderDate)],
@@ -5332,7 +5332,7 @@ function downloadJobPDF(jobId) {
 
   const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>' + css + '</style></head><body>'
     + '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">'
-    + '<div><h1>🖨 Print Pro</h1><div class="sub">Job Order System</div></div>'
+    + '<div><h1>🖨 S Prints</h1><div class="sub">Job Order System</div></div>'
     + '<div style="text-align:right;"><div class="job-tag">JOB # ' + j.jobNo + '</div>'
     + '<div style="font-size:11px;color:#888;margin-top:6px;">Date: ' + fmtDate(j.orderDate) + '</div></div></div>'
     + '<div class="header-grid">'
@@ -5359,7 +5359,7 @@ function downloadJobPDF(jobId) {
     + '<div class="trow"><span class="lbl" style="font-weight:700">Balance Due</span><span class="val ' + (bal>0?'balance':'') + '">₹' + bal.toFixed(2) + '</span></div>'
     + '</div></div>'
     + (j.specialNotes ? '<div style="margin-top:14px;padding:10px 14px;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;font-size:11px;"><b>📝 Notes:</b> ' + j.specialNotes + '</div>' : '')
-    + '<div style="margin-top:24px;padding-top:12px;border-top:1px solid #e5e7f0;font-size:10px;color:#9ca3af;text-align:center;">Generated by Print Pro · ' + new Date().toLocaleString('en-IN') + '</div>'
+    + '<div style="margin-top:24px;padding-top:12px;border-top:1px solid #e5e7f0;font-size:10px;color:#9ca3af;text-align:center;">Generated by S Prints · ' + new Date().toLocaleString('en-IN') + '</div>'
     + '<scr' + 'ipt>window.onload=function(){window.print();setTimeout(function(){window.close();},1000);};<' + '/scr' + 'ipt>'
     + '</body></html>';
 

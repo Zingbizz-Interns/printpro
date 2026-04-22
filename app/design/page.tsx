@@ -22,7 +22,7 @@ export default function Showcase() {
         </StickyNote>
 
         <h1 className="text-6xl md:text-7xl leading-[1.05] mb-4">
-          Print Pro
+          S Prints
           <span className="inline-block ml-3 animate-[sway_4s_ease-in-out_infinite] text-accent">!</span>
         </h1>
 
@@ -209,10 +209,10 @@ export default function Showcase() {
                         row[2] === 'Delivered'
                           ? 'leaf'
                           : row[2] === 'Ready'
-                          ? 'postit'
-                          : row[2] === 'In Printing'
-                          ? 'amber'
-                          : 'ink'
+                            ? 'postit'
+                            : row[2] === 'In Printing'
+                              ? 'amber'
+                              : 'ink'
                       }
                     >
                       {row[2]}

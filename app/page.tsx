@@ -42,7 +42,7 @@ export default function Home() {
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-accent text-white shadow-accent">
             <Printer size={20} strokeWidth={2.5} />
           </div>
-          <span className="font-display text-2xl tracking-tight text-foreground">Print Pro</span>
+          <span className="font-display text-2xl tracking-tight text-foreground">S Prints</span>
         </Link>
         <div className="flex items-center gap-4">
           {hydrated && user ? (
@@ -268,7 +268,7 @@ export default function Home() {
         </div>
 
         <p className="mt-12 text-center text-sm font-medium text-muted-foreground">
-          Print Pro &copy; {new Date().getFullYear()} — Structured operations for modern shops
+          S Prints &copy; {new Date().getFullYear()} — Structured operations for modern shops
         </p>
       </section>
     </main>

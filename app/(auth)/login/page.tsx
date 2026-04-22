@@ -49,7 +49,7 @@ export default function Login() {
       <div className="w-full max-w-md relative z-10">
         <div className="flex justify-center mb-6">
           <div className="bg-foreground text-white px-4 py-1.5 rounded-full font-body font-bold text-sm tracking-widest uppercase shadow-sm">
-            Print Pro
+            S Prints
           </div>
         </div>
 
@@ -93,13 +93,13 @@ export default function Login() {
                   className="mt-1.5 shadow-inner"
                 />
               </div>
-              
+
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-600 font-semibold mb-4 text-sm flex items-center gap-2 shadow-sm animate-in fade-in slide-in-from-top-2">
                   <span className="text-red-500">✗</span> {error}
                 </div>
               )}
-              
+
               <div className="pt-2">
                 <Button
                   variant="primary"
@@ -119,7 +119,7 @@ export default function Login() {
           Accounts are managed in the Supabase dashboard.
         </p>
       </div>
-      
+
       {/* Decorative background elements */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-blue-500/5 blur-[120px]" />

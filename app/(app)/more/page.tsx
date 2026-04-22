@@ -95,7 +95,7 @@ export default function MorePage() {
         </Button>
 
         <p className="text-center text-xs font-medium text-muted-foreground mt-6 uppercase tracking-widest">
-          Print Pro · Agentic Minimalist Build
+          S Prints · Agentic Minimalist Build
         </p>
       </div>
     </main>

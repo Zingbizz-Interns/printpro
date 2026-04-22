@@ -1,4 +1,4 @@
-# Print Pro — Supabase API Reference
+# S Prints — Supabase API Reference
 
 Complete catalog of every Supabase call made by `refference/copy.html`. Sourced by grepping `sb.from(...)`, `sb.rpc(...)`, `sb.storage(...)`, `sb.channel(...)`, and `sb.removeAllChannels()` across the full file.
 
