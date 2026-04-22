@@ -4,7 +4,7 @@ import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ALL_STATUSES, STATUS_THEME } from '@/lib/kanban/status-theme';
 import type { JobStatus, PaymentStatus } from '@/types/db';
-import type { KanbanFilters as KFType } from '@/lib/kanban/filtering';
+import type { KanbanFilters as KFType, SortMode } from '@/lib/kanban/filtering';
 
 interface Props {
   filters: KFType;
@@ -19,6 +19,12 @@ const PAY_OPTIONS: { v: PaymentStatus | ''; l: string }[] = [
   { v: 'Unpaid', l: '● Unpaid' },
   { v: 'Advance Paid', l: '⬡ Advance Paid' },
   { v: 'Fully Paid', l: '✓ Fully Paid' },
+];
+
+const SORT_OPTIONS: { v: SortMode; l: string }[] = [
+  { v: 'newest', l: '↓ Newest first' },
+  { v: 'oldest', l: '↑ Oldest first' },
+  { v: 'urgency', l: '⚡ Urgency' },
 ];
 
 export function KanbanFilters({ filters, onChange, onReset, visibleCount, totalCount }: Props) {
@@ -102,6 +108,20 @@ export function KanbanFilters({ filters, onChange, onReset, visibleCount, totalC
         {ALL_STATUSES.map((s) => (
           <option key={s} value={s}>
             {STATUS_THEME[s].mark} {STATUS_THEME[s].label}
+          </option>
+        ))}
+      </select>
+
+      {/* Sort dropdown */}
+      <select
+        value={filters.sort}
+        onChange={(e) => onChange({ sort: e.target.value as SortMode })}
+        aria-label="Sort order"
+        className="rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-ring focus:outline-none shadow-sm cursor-pointer"
+      >
+        {SORT_OPTIONS.map((o) => (
+          <option key={o.v} value={o.v}>
+            {o.l}
           </option>
         ))}
       </select>

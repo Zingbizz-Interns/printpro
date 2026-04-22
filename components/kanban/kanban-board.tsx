@@ -10,7 +10,7 @@ import {
   INITIAL_FILTERS,
   computeStats,
   filterJobs,
-  smartSort,
+  sortJobs,
   type KanbanFilters,
 } from '@/lib/kanban/filtering';
 import { JobCard } from './job-card';
@@ -38,7 +38,7 @@ export function KanbanBoard() {
   const jobs = jobsQ.data ?? [];
 
   const stats = useMemo(() => computeStats(jobs), [jobs]);
-  const visible = useMemo(() => smartSort(filterJobs(jobs, filters)), [jobs, filters]);
+  const visible = useMemo(() => sortJobs(filterJobs(jobs, filters), filters.sort), [jobs, filters]);
 
   const del = useMutation({
     mutationFn: (id: number) => deleteJob(id),
@@ -49,7 +49,7 @@ export function KanbanBoard() {
     setFilters((f) => ({ ...f, ...p }));
   }
   function reset() {
-    setFilters({ ...INITIAL_FILTERS, tab: filters.tab });
+    setFilters({ ...INITIAL_FILTERS, tab: filters.tab, sort: filters.sort });
   }
 
   function confirmDelete(id: number) {

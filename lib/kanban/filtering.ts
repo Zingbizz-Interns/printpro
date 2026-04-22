@@ -5,6 +5,8 @@ import { jobGrandTotal } from '@/lib/domain/totals';
 
 export type ViewTab = 'current' | 'completed';
 
+export type SortMode = 'newest' | 'oldest' | 'urgency';
+
 export interface KanbanFilters {
   tab: ViewTab;
   search: string;
@@ -13,6 +15,7 @@ export interface KanbanFilters {
   dueToday: boolean;
   paymentStatus: PaymentStatus | '';
   jobStatus: JobStatus | '';
+  sort: SortMode;
 }
 
 export const INITIAL_FILTERS: KanbanFilters = {
@@ -23,6 +26,7 @@ export const INITIAL_FILTERS: KanbanFilters = {
   dueToday: false,
   paymentStatus: '',
   jobStatus: '',
+  sort: 'newest',
 };
 
 export function filterJobs(jobs: Job[], f: KanbanFilters): Job[] {
@@ -72,6 +76,12 @@ export function filterJobs(jobs: Job[], f: KanbanFilters): Job[] {
  */
 export function smartSort(jobs: Job[]): Job[] {
   return jobs.slice().sort((a, b) => rank(a) - rank(b) || b.jobNo - a.jobNo);
+}
+
+export function sortJobs(jobs: Job[], mode: SortMode): Job[] {
+  if (mode === 'urgency') return smartSort(jobs);
+  if (mode === 'oldest') return jobs.slice().sort((a, b) => a.jobNo - b.jobNo);
+  return jobs.slice().sort((a, b) => b.jobNo - a.jobNo);
 }
 
 function rank(j: Job): number {
