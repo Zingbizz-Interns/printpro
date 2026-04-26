@@ -8,6 +8,7 @@ import { Input, Field, Textarea } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { listProducts } from '@/lib/db/products';
 import { fmt } from '@/lib/domain/totals';
+import { UNIT_OPTIONS } from '@/lib/domain/units';
 import { cn } from '@/lib/utils';
 import type { DesignStatus, JobItem, PrintStatus } from '@/types/db';
 import { ChevronDown, Plus, Trash2, ImagePlus } from 'lucide-react';
@@ -26,8 +27,6 @@ const PRINT_OPTIONS: PrintStatus[] = [
   'Ready',
   'Delivered',
 ];
-const UNIT_OPTIONS = ['Nos', 'Pcs', 'Sets', 'Pages', 'Sq.ft', 'Mtrs'];
-
 interface Props {
   items: JobItem[];
   jobNo: number;

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input, Label, Textarea } from '@/components/ui/input';
 import { useCustomerAuthStore } from '@/lib/auth/customer-store';
 import { listProducts } from '@/lib/db/products';
+import { UNIT_OPTIONS } from '@/lib/domain/units';
 import { createPendingJob } from '@/lib/db/quote-requests';
 import { uploadArtwork } from '@/lib/db/customer-artwork';
 import { triggerPortalEvent } from '@/lib/email/client';
@@ -212,12 +213,18 @@ export default function QuoteRequestPage() {
                             updateLine(l.key, { quantity: v === '' ? '' : Number(v) });
                           }}
                         />
-                        <Input
+                        <select
                           value={l.unit}
                           onChange={(e) => updateLine(l.key, { unit: e.target.value })}
-                          className="w-24"
-                          placeholder="Nos"
-                        />
+                          aria-label="Unit"
+                          className="w-24 bg-card border border-border rounded-xl px-3 py-2.5 text-foreground font-body text-base focus:border-transparent focus:ring-2 focus:ring-ring focus:outline-none shadow-sm transition-all"
+                        >
+                          {UNIT_OPTIONS.map((u) => (
+                            <option key={u} value={u}>
+                              {u}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   </div>
